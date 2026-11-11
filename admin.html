@@ -8,7 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
-<body class="bg-gray-950 text-white min-h-screen p-4">
+<body class="bg-gray-950 text-white min-h-screen p-4 font-sans">
     <!-- Security Lock Screen -->
     <div id="lockScreen" class="fixed inset-0 bg-black flex items-center justify-center p-4 z-50">
         <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4">
@@ -21,45 +21,56 @@
 
     <!-- Main Dashboard -->
     <div id="mainDashboard" class="max-w-4xl mx-auto hidden pb-20">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
             <h1 class="text-2xl font-black text-yellow-500">🔥 MX E-SPORTS ADMIN</h1>
-            <button onclick="location.reload()" class="bg-red-600/20 text-red-400 text-xs px-3 py-1.5 rounded border border-red-500/30">लॉगआउट</button>
+            <button onclick="location.reload()" class="bg-red-600/20 text-red-400 text-xs px-3 py-1.5 rounded border border-red-500/30 font-bold">लॉगआउट</button>
         </div>
 
-        <!-- 1. Create Match -->
-        <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 mb-8 shadow-xl">
-            <h2 class="text-lg font-bold mb-4 text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input id="title" type="text" placeholder="मैच नाम (उदा: Solo Bermuda #1)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
-                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
-                <input id="fee" type="number" placeholder="एंट्री फीस (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
-                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
-                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
-                <button onclick="createMatch()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2.5 rounded text-sm transition">मैच पब्लिश करें</button>
+        <!-- 1. Send Coins / Reward to Any Player Directly -->
+        <div class="bg-gray-900 p-4 rounded-xl border border-yellow-500/30 mb-6 shadow-lg">
+            <h2 class="text-base font-bold mb-2 text-yellow-400">🎁 खिलाड़ी को कॉइन / प्राइज भेजें</h2>
+            <p class="text-xs text-gray-400 mb-3">मैच जीतने वाले खिलाड़ी की Free Fire UID डालें और जितने कॉइन देने हैं वो अमाउंट डालकर भेजें:</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input id="rewardUid" type="text" placeholder="खिलाड़ी की FF UID (उदा: 123456789)" class="p-2 text-xs bg-gray-800 rounded border border-gray-700 flex-1">
+                <input id="rewardAmount" type="number" placeholder="कॉइन / अमाउंट (₹)" class="p-2 text-xs bg-gray-800 rounded border border-gray-700 w-full sm:w-36">
+                <button onclick="sendCoinsToUser()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-black text-xs">कॉइन भेजें ➔</button>
             </div>
         </div>
 
-        <!-- 2. Wallet & Withdrawals Center -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <!-- 2. Create Match -->
+        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6 shadow-xl">
+            <h2 class="text-base font-bold mb-3 text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input id="title" type="text" placeholder="मैच नाम (उदा: Solo Bermuda #1)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
+                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
+                <input id="fee" type="number" placeholder="एंट्री फीस (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
+                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
+                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
+                <button onclick="createMatch()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2.5 rounded text-xs transition">मैच पब्लिश करें</button>
+            </div>
+        </div>
+
+        <!-- 3. Wallet & Withdrawals Center -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <!-- Deposit Requests -->
             <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
-                <h2 class="text-base font-bold mb-3 text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
+                <h2 class="text-sm font-bold mb-3 text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
                 <div id="depositRequests" class="space-y-2 text-xs">
                     <p class="text-gray-500">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>
                 </div>
             </div>
 
-            <!-- Withdraw Requests -->
+            <!-- Withdraw Requests (With Player's exact UPI ID) -->
             <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
-                <h2 class="text-base font-bold mb-3 text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (Withdrawals)</h2>
+                <h2 class="text-sm font-bold mb-3 text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (पैसे भेजना है)</h2>
                 <div id="withdrawRequests" class="space-y-2 text-xs">
                     <p class="text-gray-500">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Matches List (Room ID, Players, Results) -->
-        <h2 class="text-lg font-bold mb-4 text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
+        <!-- 4. Matches List -->
+        <h2 class="text-base font-bold mb-3 text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
         <div id="matchesList" class="space-y-4"></div>
     </div>
 
@@ -67,8 +78,8 @@
     <div id="playersModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
         <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col">
             <h3 class="font-bold text-yellow-400 mb-2">👥 जॉइन किए गए खिलाड़ी</h3>
-            <div id="playersListContent" class="overflow-y-auto flex-1 space-y-2 text-sm divide-y divide-gray-800"></div>
-            <button onclick="closePlayersModal()" class="mt-4 bg-gray-800 text-white font-bold py-2 rounded text-sm">बंद करें</button>
+            <div id="playersListContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800"></div>
+            <button onclick="closePlayersModal()" class="mt-4 bg-gray-800 text-white font-bold py-2 rounded text-xs">बंद करें</button>
         </div>
     </div>
 
@@ -90,6 +101,26 @@
             } else {
                 alert("गलत पिन!");
             }
+        }
+
+        // डायरेक्ट कॉइन भेजना
+        function sendCoinsToUser() {
+            const uid = document.getElementById('rewardUid').value.trim();
+            const amount = Number(document.getElementById('rewardAmount').value);
+
+            if(!uid || !amount || amount <= 0) return alert('खिलाड़ी की UID और सही अमाउंट डालें!');
+
+            db.ref('users/' + uid).once('value', snap => {
+                const cur = (snap.val() && snap.val().balance) ? Number(snap.val().balance) : 0;
+                const newBal = cur + amount;
+
+                db.ref('users/' + uid).update({ balance: newBal })
+                    .then(() => {
+                        alert(`✅ UID: ${uid} को ₹${amount} कॉइन भेज दिए गए!\nअब उसका कुल बैलेंस: ₹${newBal}`);
+                        document.getElementById('rewardUid').value = '';
+                        document.getElementById('rewardAmount').value = '';
+                    });
+            });
         }
 
         function createMatch() {
@@ -129,10 +160,10 @@
                         <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h3 class="font-bold text-yellow-400 text-base">${m.title}</h3>
+                                    <h3 class="font-bold text-yellow-400 text-sm">${m.title}</h3>
                                     <p class="text-xs text-gray-400">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize}</p>
                                     <p class="text-xs text-blue-400 font-semibold mt-1">स्लॉट्स: ${joinedCount}/${m.slots} जॉइंड | स्टेटस: ${m.status}</p>
-                                    ${m.winner ? `<p class="text-xs text-green-400 font-bold mt-1">🏆 Winner: ${m.winner}</p>` : ''}
+                                    ${m.winner ? `<p class="text-xs text-green-400 font-bold mt-1">👑 Winner: ${m.winner}</p>` : ''}
                                 </div>
                                 <button onclick="deleteMatch('${id}')" class="text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40">डिलीट</button>
                             </div>
@@ -185,12 +216,14 @@
                 } else {
                     let i = 1;
                     for(let key in data) {
+                        const p = data[key];
                         list.innerHTML += `
                             <div class="py-2 flex justify-between items-center">
                                 <div>
-                                    <p class="font-bold text-white">${i++}. ${data[key].name}</p>
-                                    <p class="text-xs text-yellow-400">UID: ${data[key].uid}</p>
+                                    <p class="font-bold text-white">${i++}. ${p.name}</p>
+                                    <p class="text-[11px] text-yellow-400 font-mono">UID: ${p.uid}</p>
                                 </div>
+                                <button onclick="quickReward('${p.uid}')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded text-[10px] font-bold">प्राइज दें</button>
                             </div>
                         `;
                     }
@@ -200,12 +233,18 @@
             });
         }
 
+        function quickReward(uid) {
+            document.getElementById('rewardUid').value = uid;
+            closePlayersModal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function closePlayersModal() {
             document.getElementById('playersModal').classList.add('hidden');
             document.getElementById('playersModal').classList.remove('flex');
         }
 
-        // Load Deposits
+        // Load Deposits with Auto-Credit to Player's Balance
         db.ref('deposits').on('value', snap => {
             const box = document.getElementById('depositRequests');
             box.innerHTML = '';
@@ -216,24 +255,29 @@
                 const req = data[id];
                 if(req.status === 'pending') {
                     box.innerHTML += `
-                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center">
+                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center border border-gray-700">
                             <div>
                                 <p class="font-bold text-green-400">₹${req.amount} | UTR: ${req.utr}</p>
-                                <p class="text-[11px] text-gray-400">${req.userName} (UID: ${req.uid})</p>
+                                <p class="text-[11px] text-gray-300">${req.userName} (UID: ${req.uid})</p>
                             </div>
-                            <button onclick="approveDeposit('${id}')" class="bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded text-xs font-bold">Approve</button>
+                            <button onclick="approveDeposit('${id}', '${req.uid}', ${req.amount})" class="bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded text-xs font-bold">Approve (+बैलेंस)</button>
                         </div>
                     `;
                 }
             }
         });
 
-        function approveDeposit(id) {
-            db.ref('deposits/' + id).update({ status: 'approved' })
-                .then(() => alert('डिपॉजिट अप्रूव हो गया!'));
+        function approveDeposit(id, uid, amount) {
+            // अप्रूव करते ही खिलाड़ी के खाते में बैलेंस जुड़ जाएगा
+            db.ref('users/' + uid).once('value', snap => {
+                const cur = (snap.val() && snap.val().balance) ? Number(snap.val().balance) : 0;
+                db.ref('users/' + uid).update({ balance: cur + Number(amount) });
+                db.ref('deposits/' + id).update({ status: 'approved' })
+                    .then(() => alert(`✅ डिपॉजिट स्वीकृत! खिलाड़ी (UID: ${uid}) के खाते में ₹${amount} जुड़ गए।`));
+            });
         }
 
-        // Load Withdrawals
+        // Load Withdrawals (Shows Exact UPI ID)
         db.ref('withdrawals').on('value', snap => {
             const box = document.getElementById('withdrawRequests');
             box.innerHTML = '';
@@ -244,25 +288,25 @@
                 const req = data[id];
                 if(req.status === 'pending') {
                     box.innerHTML += `
-                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center">
+                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center border border-gray-700">
                             <div>
-                                <p class="font-bold text-yellow-400">₹${req.amount} निकलवाना है</p>
-                                <p class="text-[11px] text-white font-mono select-all">UPI: ${req.upi}</p>
+                                <p class="font-bold text-yellow-400">₹${req.amount} भेजना है</p>
+                                <p class="text-[11px] text-white font-mono bg-gray-900 px-1.5 py-0.5 rounded select-all font-bold">UPI: ${req.upi}</p>
                                 <p class="text-[10px] text-gray-400">${req.userName} (UID: ${req.uid})</p>
                             </div>
-                            <button onclick="approveWithdraw('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black px-2.5 py-1 rounded text-xs font-bold">Paid (भेज दिया)</button>
+                            <button onclick="approveWithdraw('${id}', '${req.upi}', ${req.amount})" class="bg-yellow-500 hover:bg-yellow-600 text-black px-2.5 py-1 rounded text-xs font-black">Paid (भेज दिया)</button>
                         </div>
                     `;
                 }
             }
         });
 
-        function approveWithdraw(id) {
-            if(confirm('क्या आपने खिलाड़ी को उसके UPI पर पैसे भेज दिए हैं?')) {
+        function approveWithdraw(id, upi, amount) {
+            if(confirm(`क्या आपने खिलाड़ी के UPI (${upi}) पर ₹${amount} भेज दिए हैं?`)) {
                 db.ref('withdrawals/' + id).update({ status: 'paid' })
-                    .then(() => alert('विड्रॉल रिक्वेस्ट पूरी (Paid) मार्क हो गई!'));
+                    .then(() => alert('✅ विड्रॉल रिक्वेस्ट पूरी (Paid) मार्क हो गई!'));
             }
         }
     </script>
 </body>
-    </html>
+                                                                                                                                                                </html>
