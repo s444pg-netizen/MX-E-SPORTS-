@@ -8,81 +8,137 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
-<body class="bg-gray-950 text-white min-h-screen p-4 font-sans">
+<body class="bg-gray-950 text-white min-h-screen p-4 font-sans select-none">
+
     <!-- Security Lock Screen -->
     <div id="lockScreen" class="fixed inset-0 bg-black flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4 shadow-2xl">
             <h2 class="text-xl font-bold text-yellow-500">🔒 Admin Access</h2>
             <p class="text-xs text-gray-400">एडमिन पिन दर्ज करें (Default: 1234)</p>
-            <input id="adminPin" type="password" placeholder="Enter PIN" class="w-full p-2.5 rounded bg-gray-800 border border-gray-700 text-center tracking-widest text-lg focus:outline-none">
-            <button onclick="checkPin()" class="w-full bg-yellow-500 text-black font-bold py-2 rounded">लॉगिन करें</button>
+            <input id="adminPin" type="password" placeholder="Enter PIN" class="w-full p-2.5 rounded bg-gray-800 border border-gray-700 text-center tracking-widest text-lg focus:outline-none focus:border-yellow-500 text-white">
+            <button onclick="checkPin()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded text-sm transition">लॉगिन करें</button>
         </div>
     </div>
 
     <!-- Main Dashboard -->
-    <div id="mainDashboard" class="max-w-4xl mx-auto hidden pb-20">
-        <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
-            <h1 class="text-2xl font-black text-yellow-500">🔥 MX E-SPORTS ADMIN</h1>
-            <button onclick="location.reload()" class="bg-red-600/20 text-red-400 text-xs px-3 py-1.5 rounded border border-red-500/30 font-bold">लॉगआउट</button>
+    <div id="mainDashboard" class="max-w-4xl mx-auto hidden pb-24 space-y-6">
+        
+        <!-- Top Stats Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-xl">
+            <div>
+                <h1 class="text-2xl font-black text-yellow-500 tracking-wider">🔥 MX E-SPORTS ADMIN</h1>
+                <p class="text-xs text-gray-400">मास्टर कंट्रोल पैनल</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="bg-gray-800 border border-yellow-500/30 px-3.5 py-1.5 rounded-xl text-center">
+                    <p class="text-[10px] text-gray-400 font-bold">टोटल रजिस्टर्ड खिलाड़ी</p>
+                    <p id="totalUsersCount" class="text-lg font-black text-yellow-400 font-mono">0</p>
+                </div>
+                <button onclick="location.reload()" class="bg-red-950/60 text-red-400 border border-red-800/60 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-900 transition">लॉगआउट</button>
+            </div>
         </div>
 
-        <!-- 1. Send Coins / Reward to Any Player Directly -->
-        <div class="bg-gray-900 p-4 rounded-xl border border-yellow-500/30 mb-6 shadow-lg">
-            <h2 class="text-base font-bold mb-2 text-yellow-400">🎁 खिलाड़ी को कॉइन / प्राइज भेजें</h2>
-            <p class="text-xs text-gray-400 mb-3">मैच जीतने वाले खिलाड़ी की Free Fire UID डालें और जितने कॉइन देने हैं वो अमाउंट डालकर भेजें:</p>
+        <!-- ========================================== -->
+        <!-- 1. USER MANAGEMENT (SEARCH, BLOCK, UNBLOCK)-->
+        <!-- ========================================== -->
+        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-yellow-400">👥 खिलाड़ी प्रबंधन (User Management)</h2>
+                    <p class="text-xs text-gray-400">सभी रजिस्टर्ड खिलाड़ी देखें, UID से खोजें या ब्लॉक करें</p>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <input id="searchUserUid" type="text" onkeyup="filterUsers()" placeholder="🔍 खिलाड़ी की UID या नाम से खोजें..." class="w-full p-2.5 pl-9 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500">
+                <span class="absolute left-3 top-2.5 text-gray-400 text-xs">🔍</span>
+            </div>
+
+            <!-- Users List Table / Cards -->
+            <div id="usersListContainer" class="max-h-80 overflow-y-auto space-y-2.5 pr-1 divide-y divide-gray-800/60">
+                <p class="text-gray-500 text-xs text-center py-6">लोड हो रहा है...</p>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 2. SEND COINS / REWARD TOOL                -->
+        <!-- ========================================== -->
+        <div class="bg-gray-900 p-4 rounded-2xl border border-yellow-500/30 shadow-lg space-y-2">
+            <h2 class="text-sm font-bold text-yellow-400">🎁 खिलाड़ी को सीधे कॉइन / प्राइज भेजें</h2>
             <div class="flex flex-col sm:flex-row gap-2">
-                <input id="rewardUid" type="text" placeholder="खिलाड़ी की FF UID (उदा: 123456789)" class="p-2 text-xs bg-gray-800 rounded border border-gray-700 flex-1">
-                <input id="rewardAmount" type="number" placeholder="कॉइन / अमाउंट (₹)" class="p-2 text-xs bg-gray-800 rounded border border-gray-700 w-full sm:w-36">
-                <button onclick="sendCoinsToUser()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-black text-xs">कॉइन भेजें ➔</button>
+                <input id="rewardUid" type="text" placeholder="खिलाड़ी की FF UID (उदा: 123456789)" class="p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white">
+                <input id="rewardAmount" type="number" placeholder="कॉइन / अमाउंट (₹)" class="p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 w-full sm:w-36 text-white">
+                <button onclick="sendCoinsToUser()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-black text-xs transition">कॉइन भेजें ➔</button>
             </div>
         </div>
 
-        <!-- 2. Create Match -->
-        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 mb-6 shadow-xl">
-            <h2 class="text-base font-bold mb-3 text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
+        <!-- ========================================== -->
+        <!-- 3. CREATE MATCH                            -->
+        <!-- ========================================== -->
+        <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input id="title" type="text" placeholder="मैच नाम (उदा: Solo Bermuda #1)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
-                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
-                <input id="fee" type="number" placeholder="एंट्री फीस (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
-                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
-                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-xs">
-                <button onclick="createMatch()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2.5 rounded text-xs transition">मैच पब्लिश करें</button>
+                <input id="title" type="text" placeholder="मैच नाम (Duo मैच के लिए नाम में 'Duo' लिखें)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="fee" type="number" placeholder="एंट्री फीस प्रति खिलाड़ी (₹)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <button onclick="createMatch()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-lg text-xs transition">मैच पब्लिश करें</button>
             </div>
         </div>
 
-        <!-- 3. Wallet & Withdrawals Center -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- ========================================== -->
+        <!-- 4. WALLET & WITHDRAWALS CENTER             -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Deposit Requests -->
-            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow">
                 <h2 class="text-sm font-bold mb-3 text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
-                <div id="depositRequests" class="space-y-2 text-xs">
+                <div id="depositRequests" class="space-y-2 text-xs max-h-60 overflow-y-auto">
                     <p class="text-gray-500">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>
                 </div>
             </div>
 
-            <!-- Withdraw Requests (With Player's exact UPI ID) -->
-            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
+            <!-- Withdraw Requests -->
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow">
                 <h2 class="text-sm font-bold mb-3 text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (पैसे भेजना है)</h2>
-                <div id="withdrawRequests" class="space-y-2 text-xs">
+                <div id="withdrawRequests" class="space-y-2 text-xs max-h-60 overflow-y-auto">
                     <p class="text-gray-500">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>
                 </div>
             </div>
         </div>
 
-        <!-- 4. Matches List -->
-        <h2 class="text-base font-bold mb-3 text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
-        <div id="matchesList" class="space-y-4"></div>
-    </div>
-
-    <!-- Players Modal -->
-    <div id="playersModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col">
-            <h3 class="font-bold text-yellow-400 mb-2">👥 जॉइन किए गए खिलाड़ी</h3>
-            <div id="playersListContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800"></div>
-            <button onclick="closePlayersModal()" class="mt-4 bg-gray-800 text-white font-bold py-2 rounded text-xs">बंद करें</button>
+        <!-- ========================================== -->
+        <!-- 5. MATCHES LIST                            -->
+        <!-- ========================================== -->
+        <div class="space-y-3">
+            <h2 class="text-sm font-bold text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
+            <div id="matchesList" class="space-y-4"></div>
         </div>
     </div>
 
+    <!-- User Full Details Modal -->
+    <div id="userDetailsModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs space-y-3 shadow-2xl">
+            <h3 class="font-bold text-yellow-400 text-sm border-b border-gray-800 pb-2">📋 खिलाड़ी की पूरी जानकारी</h3>
+            <div id="userDetailsContent" class="text-xs space-y-2"></div>
+            <button onclick="closeModal('userDetailsModal')" class="w-full bg-gray-800 text-white font-bold py-2 rounded-lg text-xs">बंद करें</button>
+        </div>
+    </div>
+
+    <!-- Players Modal -->
+    <div id="playersModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
+            <h3 class="font-bold text-yellow-400 mb-2 text-sm">👥 मैच में जॉइन किए गए खिलाड़ी</h3>
+            <div id="playersListContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800"></div>
+            <button onclick="closeModal('playersModal')" class="mt-4 bg-gray-800 text-white font-bold py-2 rounded-lg text-xs">बंद करें</button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC                           -->
+    <!-- ========================================== -->
     <script>
         // अपना Firebase Config यहाँ पेस्ट करें
         const firebaseConfig = {
@@ -92,6 +148,8 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        let allUsersData = [];
 
         function checkPin() {
             const pin = document.getElementById('adminPin').value;
@@ -103,7 +161,103 @@
             }
         }
 
-        // डायरेक्ट कॉइन भेजना
+        // ==========================================
+        // 1. LOAD ALL USERS & STATS
+        // ==========================================
+        db.ref('users').on('value', snap => {
+            allUsersData = [];
+            snap.forEach(child => {
+                allUsersData.push(child.val());
+            });
+
+            document.getElementById('totalUsersCount').innerText = allUsersData.length;
+            renderUsers(allUsersData);
+        });
+
+        function renderUsers(users) {
+            const container = document.getElementById('usersListContainer');
+            container.innerHTML = '';
+
+            if(!users || users.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-xs text-center py-4">कोई खिलाड़ी नहीं मिला।</p>';
+                return;
+            }
+
+            users.forEach(u => {
+                const isBlocked = (u.isBlocked === true);
+                container.innerHTML += `
+                    <div class="pt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-xs">${u.name}</span>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${isBlocked ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'}">
+                                    ${isBlocked ? '🚫 Blocked' : '🟢 Active'}
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 font-mono">UID: <b class="text-yellow-400">${u.uid}</b> | 💰 बैलेंस: ₹${u.balance || 0}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                            <button onclick="viewUserDetails('${u.uid}')" class="flex-1 sm:flex-none bg-gray-800 hover:bg-gray-700 text-gray-300 px-2.5 py-1 rounded text-[11px]">
+                                जानकारी
+                            </button>
+                            <button onclick="quickReward('${u.uid}')" class="flex-1 sm:flex-none bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 px-2.5 py-1 rounded text-[11px] font-bold">
+                                +कॉइन
+                            </button>
+                            <button onclick="toggleBlockUser('${u.uid}', ${isBlocked})" class="flex-1 sm:flex-none ${isBlocked ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'} px-2.5 py-1 rounded text-[11px] font-bold transition">
+                                ${isBlocked ? 'Unblock' : 'Block'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // FILTER USERS BY UID OR NAME
+        function filterUsers() {
+            const query = document.getElementById('searchUserUid').value.toLowerCase().trim();
+            const filtered = allUsersData.filter(u => 
+                (u.uid && u.uid.toLowerCase().includes(query)) ||
+                (u.name && u.name.toLowerCase().includes(query)) ||
+                (u.phone && u.phone.includes(query))
+            );
+            renderUsers(filtered);
+        }
+
+        // BLOCK / UNBLOCK TOGGLE
+        function toggleBlockUser(uid, currentStatus) {
+            const newStatus = !currentStatus;
+            const actionText = newStatus ? 'ब्लॉक (Block)' : 'अनब्लॉक (Unblock)';
+            
+            if(confirm(`क्या आप सच में खिलाड़ी UID: ${uid} को ${actionText} करना चाहते हैं?`)) {
+                db.ref('users/' + uid).update({ isBlocked: newStatus }).then(() => {
+                    alert(`खिलाड़ी सफलतापूर्वक ${actionText} हो गया!`);
+                });
+            }
+        }
+
+        // VIEW FULL USER DETAILS
+        function viewUserDetails(uid) {
+            const user = allUsersData.find(u => u.uid === uid);
+            if(!user) return;
+
+            const content = document.getElementById('userDetailsContent');
+            content.innerHTML = `
+                <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 space-y-1.5">
+                    <p><span class="text-gray-400">इन-गेम नाम:</span> <b class="text-white">${user.name}</b></p>
+                    <p><span class="text-gray-400">Free Fire UID:</span> <b class="text-yellow-400 font-mono">${user.uid}</b></p>
+                    <p><span class="text-gray-400">मोबाइल नंबर:</span> <b class="text-white">${user.phone || 'N/A'}</b></p>
+                    <p><span class="text-gray-400">पासवर्ड:</span> <b class="text-red-400 font-mono">${user.pass || 'N/A'}</b></p>
+                    <p><span class="text-gray-400">मौजूदा बैलेंस:</span> <b class="text-green-400 font-mono">₹${user.balance || 0}</b></p>
+                    <p><span class="text-gray-400">स्टेटस:</span> <b class="${user.isBlocked ? 'text-red-400' : 'text-green-400'}">${user.isBlocked ? 'ब्लॉक्ड (प्रतिबंधित)' : 'सक्रिय (Active)'}</b></p>
+                    <p><span class="text-gray-400">रजिस्ट्रेशन तारीख:</span> <span class="text-gray-300 text-[10px]">${new Date(user.createdAt || Date.now()).toLocaleDateString()}</span></p>
+                </div>
+            `;
+            openModal('userDetailsModal');
+        }
+
+        // ==========================================
+        // 2. SEND COINS / REWARDS
+        // ==========================================
         function sendCoinsToUser() {
             const uid = document.getElementById('rewardUid').value.trim();
             const amount = Number(document.getElementById('rewardAmount').value);
@@ -111,18 +265,27 @@
             if(!uid || !amount || amount <= 0) return alert('खिलाड़ी की UID और सही अमाउंट डालें!');
 
             db.ref('users/' + uid).once('value', snap => {
-                const cur = (snap.val() && snap.val().balance) ? Number(snap.val().balance) : 0;
+                if(!snap.exists()) return alert('यह UID रजिस्टर्ड नहीं है!');
+                const cur = Number(snap.val().balance || 0);
                 const newBal = cur + amount;
 
                 db.ref('users/' + uid).update({ balance: newBal })
                     .then(() => {
-                        alert(`✅ UID: ${uid} को ₹${amount} कॉइन भेज दिए गए!\nअब उसका कुल बैलेंस: ₹${newBal}`);
+                        alert(`✅ UID: ${uid} को ₹${amount} कॉइन भेज दिए गए!\nनया बैलेंस: ₹${newBal}`);
                         document.getElementById('rewardUid').value = '';
                         document.getElementById('rewardAmount').value = '';
                     });
             });
         }
 
+        function quickReward(uid) {
+            document.getElementById('rewardUid').value = uid;
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // 3. MATCH MANAGEMENT
+        // ==========================================
         function createMatch() {
             const title = document.getElementById('title').value;
             const time = document.getElementById('time').value;
@@ -145,12 +308,12 @@
             });
         }
 
-        // Load Matches
+        // LOAD MATCHES
         db.ref('matches').on('value', snapshot => {
             const container = document.getElementById('matchesList');
             container.innerHTML = '';
             const data = snapshot.val();
-            if(!data) return container.innerHTML = '<p class="text-gray-500 text-sm">कोई मैच नहीं है।</p>';
+            if(!data) return container.innerHTML = '<p class="text-gray-500 text-xs">कोई मैच नहीं है।</p>';
 
             for(let id in data) {
                 const m = data[id];
@@ -169,14 +332,14 @@
                             </div>
 
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 my-3">
-                                <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
-                                <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
-                                <button onclick="updateRoom('${id}')" class="bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold">ID/Pass भेजें</button>
-                                <button onclick="viewPlayers('${id}')" class="bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold">खिलाड़ी देखें (${joinedCount})</button>
+                                <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
+                                <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
+                                <button onclick="updateRoom('${id}')" class="bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold text-white">ID/Pass भेजें</button>
+                                <button onclick="viewPlayers('${id}')" class="bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold text-white">खिलाड़ी देखें (${joinedCount})</button>
                             </div>
 
                             <div class="flex gap-2 items-center pt-2 border-t border-gray-800">
-                                <input id="win_${id}" type="text" placeholder="विनर का IGN / UID" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
+                                <input id="win_${id}" type="text" placeholder="विनर का IGN / UID" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
                                 <button onclick="setWinner('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black text-xs px-3 py-1.5 rounded font-bold">विनर घोषित करें</button>
                             </div>
                         </div>
@@ -220,31 +383,21 @@
                         list.innerHTML += `
                             <div class="py-2 flex justify-between items-center">
                                 <div>
-                                    <p class="font-bold text-white">${i++}. ${p.name}</p>
-                                    <p class="text-[11px] text-yellow-400 font-mono">UID: ${p.uid}</p>
+                                    <p class="font-bold text-white">${i++}. ${p.p1Name} <span class="text-yellow-400 font-mono">(${p.p1Uid})</span></p>
+                                    ${p.p2Name ? `<p class="text-[10px] text-gray-400 pl-2">↳ Duo: ${p.p2Name} (${p.p2Uid})</p>` : ''}
                                 </div>
-                                <button onclick="quickReward('${p.uid}')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded text-[10px] font-bold">प्राइज दें</button>
+                                <button onclick="quickReward('${p.p1Uid}')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded text-[10px] font-bold">प्राइज दें</button>
                             </div>
                         `;
                     }
                 }
-                document.getElementById('playersModal').classList.remove('hidden');
-                document.getElementById('playersModal').classList.add('flex');
+                openModal('playersModal');
             });
         }
 
-        function quickReward(uid) {
-            document.getElementById('rewardUid').value = uid;
-            closePlayersModal();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function closePlayersModal() {
-            document.getElementById('playersModal').classList.add('hidden');
-            document.getElementById('playersModal').classList.remove('flex');
-        }
-
-        // Load Deposits with Auto-Credit to Player's Balance
+        // ==========================================
+        // 4. DEPOSITS & WITHDRAWALS
+        // ==========================================
         db.ref('deposits').on('value', snap => {
             const box = document.getElementById('depositRequests');
             box.innerHTML = '';
@@ -255,12 +408,12 @@
                 const req = data[id];
                 if(req.status === 'pending') {
                     box.innerHTML += `
-                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center border border-gray-700">
+                        <div class="bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700">
                             <div>
                                 <p class="font-bold text-green-400">₹${req.amount} | UTR: ${req.utr}</p>
                                 <p class="text-[11px] text-gray-300">${req.userName} (UID: ${req.uid})</p>
                             </div>
-                            <button onclick="approveDeposit('${id}', '${req.uid}', ${req.amount})" class="bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded text-xs font-bold">Approve (+बैलेंस)</button>
+                            <button onclick="approveDeposit('${id}', '${req.uid}', ${req.amount})" class="bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded text-xs font-bold text-white">Approve (+बैलेंस)</button>
                         </div>
                     `;
                 }
@@ -268,16 +421,14 @@
         });
 
         function approveDeposit(id, uid, amount) {
-            // अप्रूव करते ही खिलाड़ी के खाते में बैलेंस जुड़ जाएगा
             db.ref('users/' + uid).once('value', snap => {
-                const cur = (snap.val() && snap.val().balance) ? Number(snap.val().balance) : 0;
+                const cur = Number(snap.val()?.balance || 0);
                 db.ref('users/' + uid).update({ balance: cur + Number(amount) });
                 db.ref('deposits/' + id).update({ status: 'approved' })
                     .then(() => alert(`✅ डिपॉजिट स्वीकृत! खिलाड़ी (UID: ${uid}) के खाते में ₹${amount} जुड़ गए।`));
             });
         }
 
-        // Load Withdrawals (Shows Exact UPI ID)
         db.ref('withdrawals').on('value', snap => {
             const box = document.getElementById('withdrawRequests');
             box.innerHTML = '';
@@ -288,7 +439,7 @@
                 const req = data[id];
                 if(req.status === 'pending') {
                     box.innerHTML += `
-                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center border border-gray-700">
+                        <div class="bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700">
                             <div>
                                 <p class="font-bold text-yellow-400">₹${req.amount} भेजना है</p>
                                 <p class="text-[11px] text-white font-mono bg-gray-900 px-1.5 py-0.5 rounded select-all font-bold">UPI: ${req.upi}</p>
@@ -307,6 +458,16 @@
                     .then(() => alert('✅ विड्रॉल रिक्वेस्ट पूरी (Paid) मार्क हो गई!'));
             }
         }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
     </script>
 </body>
-                                                                                                                                                                </html>
+                </html>
