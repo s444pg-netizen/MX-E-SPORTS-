@@ -39,11 +39,22 @@
             </div>
         </div>
 
-        <!-- 2. Wallet Deposit Requests -->
-        <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 mb-8 shadow-xl">
-            <h2 class="text-lg font-bold mb-3 text-green-400">💰 वॉलेट रिचार्ज रिक्वेस्ट्स</h2>
-            <div id="depositRequests" class="space-y-2 text-sm">
-                <p class="text-gray-500 text-xs">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>
+        <!-- 2. Wallet & Withdrawals Center -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <!-- Deposit Requests -->
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
+                <h2 class="text-base font-bold mb-3 text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
+                <div id="depositRequests" class="space-y-2 text-xs">
+                    <p class="text-gray-500">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>
+                </div>
+            </div>
+
+            <!-- Withdraw Requests -->
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
+                <h2 class="text-base font-bold mb-3 text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (Withdrawals)</h2>
+                <div id="withdrawRequests" class="space-y-2 text-xs">
+                    <p class="text-gray-500">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>
+                </div>
             </div>
         </div>
 
@@ -73,7 +84,7 @@
 
         function checkPin() {
             const pin = document.getElementById('adminPin').value;
-            if(pin === "987080") { // आप इस 1234 को बदलकर अपना पासवर्ड बना सकते हैं
+            if(pin === "1234") {
                 document.getElementById('lockScreen').classList.add('hidden');
                 document.getElementById('mainDashboard').classList.remove('hidden');
             } else {
@@ -126,7 +137,6 @@
                                 <button onclick="deleteMatch('${id}')" class="text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40">डिलीट</button>
                             </div>
 
-                            <!-- Room ID Update -->
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 my-3">
                                 <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
                                 <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
@@ -134,7 +144,6 @@
                                 <button onclick="viewPlayers('${id}')" class="bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold">खिलाड़ी देखें (${joinedCount})</button>
                             </div>
 
-                            <!-- Declare Winner Section -->
                             <div class="flex gap-2 items-center pt-2 border-t border-gray-800">
                                 <input id="win_${id}" type="text" placeholder="विनर का IGN / UID" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
                                 <button onclick="setWinner('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black text-xs px-3 py-1.5 rounded font-bold">विनर घोषित करें</button>
@@ -209,10 +218,10 @@
                     box.innerHTML += `
                         <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center">
                             <div>
-                                <p class="font-bold text-yellow-400">₹${req.amount} | UTR: ${req.utr}</p>
-                                <p class="text-xs text-gray-400">User: ${req.userName} (UID: ${req.uid})</p>
+                                <p class="font-bold text-green-400">₹${req.amount} | UTR: ${req.utr}</p>
+                                <p class="text-[11px] text-gray-400">${req.userName} (UID: ${req.uid})</p>
                             </div>
-                            <button onclick="approveDeposit('${id}')" class="bg-green-600 px-3 py-1 rounded text-xs font-bold">Approve</button>
+                            <button onclick="approveDeposit('${id}')" class="bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded text-xs font-bold">Approve</button>
                         </div>
                     `;
                 }
@@ -221,8 +230,39 @@
 
         function approveDeposit(id) {
             db.ref('deposits/' + id).update({ status: 'approved' })
-                .then(() => alert('पेमेंट अप्रूव हो गया!'));
+                .then(() => alert('डिपॉजिट अप्रूव हो गया!'));
+        }
+
+        // Load Withdrawals
+        db.ref('withdrawals').on('value', snap => {
+            const box = document.getElementById('withdrawRequests');
+            box.innerHTML = '';
+            const data = snap.val();
+            if(!data) return box.innerHTML = '<p class="text-gray-500 text-xs">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>';
+
+            for(let id in data) {
+                const req = data[id];
+                if(req.status === 'pending') {
+                    box.innerHTML += `
+                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-yellow-400">₹${req.amount} निकलवाना है</p>
+                                <p class="text-[11px] text-white font-mono select-all">UPI: ${req.upi}</p>
+                                <p class="text-[10px] text-gray-400">${req.userName} (UID: ${req.uid})</p>
+                            </div>
+                            <button onclick="approveWithdraw('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black px-2.5 py-1 rounded text-xs font-bold">Paid (भेज दिया)</button>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        function approveWithdraw(id) {
+            if(confirm('क्या आपने खिलाड़ी को उसके UPI पर पैसे भेज दिए हैं?')) {
+                db.ref('withdrawals/' + id).update({ status: 'paid' })
+                    .then(() => alert('विड्रॉल रिक्वेस्ट पूरी (Paid) मार्क हो गई!'));
+            }
         }
     </script>
 </body>
-                    </html>
+    </html>
