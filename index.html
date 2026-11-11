@@ -10,15 +10,27 @@
 </head>
 <body class="bg-gray-950 text-white min-h-screen pb-20 font-sans">
 
-    <!-- Header -->
-    <header class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-40 flex justify-between items-center shadow-lg">
-        <div>
-            <h1 class="text-xl font-black text-yellow-500 tracking-wider">MX E-SPORTS</h1>
-            <p class="text-[11px] text-gray-400">Official Free Fire Arena</p>
+    <!-- Header with Live User Balance -->
+    <header class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-40 shadow-lg">
+        <div class="flex justify-between items-center mb-2">
+            <div>
+                <h1 class="text-xl font-black text-yellow-500 tracking-wider">MX E-SPORTS</h1>
+                <p id="userProfileTag" class="text-[11px] text-gray-400">प्रोफाइल सेट करें</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-gray-800 border border-yellow-500/40 px-3 py-1 rounded-full text-xs font-black text-yellow-400">
+                    💰 <span id="displayBalance">₹0</span>
+                </div>
+                <button onclick="openWalletModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-1 rounded-full text-xs font-black shadow-md hover:opacity-90">
+                    वॉलेट
+                </button>
+            </div>
         </div>
-        <button onclick="openWalletModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-1 shadow-md hover:opacity-90 transition">
-            <span>💰 वॉलेट / विड्रॉल</span>
-        </button>
+        <!-- Profile bar -->
+        <div class="flex justify-between items-center text-[11px] bg-gray-950/60 px-2.5 py-1 rounded-lg border border-gray-800">
+            <span id="playerInfoText" class="text-gray-300">UID सेट नहीं है</span>
+            <button onclick="promptSetProfile()" class="text-yellow-400 hover:underline font-semibold">बदलें / सेट करें</button>
+        </div>
     </header>
 
     <!-- Navigation Tabs -->
@@ -54,69 +66,61 @@
         </div>
     </div>
 
-    <!-- Wallet Modal (Add Money + Withdraw) -->
+    <!-- Wallet Modal (Add Money + Withdraw with Strict Balance Check) -->
     <div id="walletModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                <h3 class="font-bold text-yellow-400 text-base">💰 वॉलेट सेंटर</h3>
+                <div>
+                    <h3 class="font-bold text-yellow-400 text-base">💰 वॉलेट सेंटर</h3>
+                    <p class="text-[11px] text-gray-400">मौजूदा बैलेंस: <span id="modalBalance" class="text-green-400 font-bold font-mono">₹0</span></p>
+                </div>
                 <button onclick="closeModal('walletModal')" class="text-gray-400 hover:text-white font-bold text-lg">&times;</button>
             </div>
 
-            <!-- Wallet Sub Tabs -->
+            <!-- Sub Tabs -->
             <div class="flex bg-gray-800 p-1 rounded-xl text-xs font-bold text-center gap-1">
                 <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">➕ Add Money</button>
                 <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white">💸 Withdraw</button>
             </div>
 
-            <!-- 1. Add Money Section (Live Automatic QR Code) -->
+            <!-- 1. Add Money Section -->
             <div id="depositSection" class="space-y-3">
                 <div class="bg-gray-800/80 p-3 rounded-xl text-center space-y-2 flex flex-col items-center border border-gray-700/60">
                     <p class="text-xs text-gray-300 font-semibold">QR कोड स्कैन करके पेमेंट करें:</p>
-                    
-                    <!-- 7985589166@fam का ऑटोमैटिक QR कोड -->
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D7985589166%40fam%26pn%3DMX_ESPORTS%26cu%3DINR" 
                          alt="UPI QR Code" 
-                         class="w-40 h-40 rounded-lg border-2 border-yellow-500 p-1 bg-white shadow mx-auto">
-                    
-                    <p class="text-[10px] text-gray-400">PhonePe / Google Pay / Paytm / FamPay</p>
-                    <div class="bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-700 w-full">
-                        <p class="text-[10px] text-gray-400">या UPI ID पर भेजें:</p>
-                        <p class="font-mono text-xs text-yellow-400 font-bold select-all tracking-wider">7985589166@fam</p>
+                         class="w-36 h-36 rounded-lg border-2 border-yellow-500 p-1 bg-white shadow mx-auto">
+                    <div class="bg-gray-900 px-3 py-1 rounded-lg border border-gray-700 w-full text-center">
+                        <p class="font-mono text-xs text-yellow-400 font-bold select-all">7985589166@fam</p>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <input id="depositUser" type="text" placeholder="अपना नाम" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
-                    <input id="depositUid" type="text" placeholder="Free Fire UID" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <input id="depositAmount" type="number" placeholder="पेमेंट अमाउंट (₹)" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <input id="depositUtr" type="text" placeholder="12-अंकों का UTR / Ref No." class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <button onclick="submitDeposit()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg text-xs transition">ऐड मनी रिक्वेस्ट भेजें</button>
                 </div>
             </div>
 
-            <!-- 2. Withdraw Section -->
+            <!-- 2. Withdraw Section (Strict Coin Check) -->
             <div id="withdrawSection" class="space-y-3 hidden">
-                <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 text-xs text-gray-300 space-y-1">
+                <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60 text-[11px] text-gray-300 space-y-0.5">
                     <p class="text-yellow-400 font-bold">⚠️ विड्रॉल नियम:</p>
-                    <p>• जीती हुई राशि 2 घंटे में ट्रांसफर होगी।</p>
-                    <p>• अपना सही UPI ID या PhonePe नंबर डालें।</p>
+                    <p>• आप अधिकतम अपने बैलेंस जितना ही विड्रॉल कर सकते हैं।</p>
+                    <p>• सही UPI ID डालें, गलत UPI पर पैसे नहीं आएँगे।</p>
                 </div>
 
                 <div class="space-y-2">
-                    <input id="wthUser" type="text" placeholder="अपना नाम" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
-                    <input id="wthUid" type="text" placeholder="Free Fire UID" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <input id="wthAmount" type="number" placeholder="विड्रॉल अमाउंट (₹)" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
-                    <input id="wthUpi" type="text" placeholder="अपनी UPI ID (उदा: 9876543210@paytm)" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white font-mono">
-                    <button onclick="submitWithdraw()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2 rounded-lg text-xs transition">विड्रॉल रिक्वेस्ट सबमिट करें</button>
+                    <input id="wthUpi" type="text" placeholder="अपनी सही UPI ID (उदा: 9876543210@paytm)" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white font-mono">
+                    <button onclick="submitWithdraw()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2 rounded-lg text-xs transition">विड्रॉल रिक्वेस्ट भेजें</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ==========================================
         // अपना FIREBASE CONFIG यहाँ डालें
-        // ==========================================
         const firebaseConfig = {
             apiKey: "1:490438093989:web:45311a4b2cbe6f6f4b714c",
             databaseURL: "https://mx-e-sports-82b3d-default-rtdb.firebaseio.com",
@@ -125,7 +129,53 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        let myUid = localStorage.getItem('mx_ff_uid') || '';
+        let myName = localStorage.getItem('mx_ff_name') || '';
+        let myCurrentBalance = 0;
         let activeMatchId = null;
+
+        // Initialize User Profile & Realtime Balance Listener
+        function initUserProfile() {
+            if(!myUid) {
+                promptSetProfile();
+            } else {
+                updateProfileUI();
+                listenUserBalance();
+            }
+        }
+
+        function promptSetProfile() {
+            const uidInput = prompt("अपनी Free Fire UID दर्ज करें (नंबर):", myUid);
+            if(!uidInput) return;
+            const nameInput = prompt("अपना Free Fire इन-गेम नाम (IGN) दर्ज करें:", myName || "Player");
+            
+            myUid = uidInput.trim();
+            myName = nameInput ? nameInput.trim() : "Player";
+            localStorage.setItem('mx_ff_uid', myUid);
+            localStorage.setItem('mx_ff_name', myName);
+            
+            updateProfileUI();
+            listenUserBalance();
+        }
+
+        function updateProfileUI() {
+            document.getElementById('playerInfoText').innerText = `IGN: ${myName} | UID: ${myUid}`;
+            document.getElementById('userProfileTag').innerText = `खिलाड़ी: ${myName}`;
+            if(document.getElementById('playerName')) document.getElementById('playerName').value = myName;
+            if(document.getElementById('playerUid')) document.getElementById('playerUid').value = myUid;
+        }
+
+        function listenUserBalance() {
+            if(!myUid) return;
+            db.ref('users/' + myUid).on('value', snap => {
+                const data = snap.val();
+                myCurrentBalance = (data && data.balance) ? Number(data.balance) : 0;
+                document.getElementById('displayBalance').innerText = '₹' + myCurrentBalance;
+                document.getElementById('modalBalance').innerText = '₹' + myCurrentBalance;
+            });
+        }
+
+        window.onload = initUserProfile;
 
         function switchTab(tab) {
             if(tab === 'matches') {
@@ -155,6 +205,7 @@
             }
         }
 
+        // लोड टूर्नामेंट्स
         db.ref('matches').on('value', snapshot => {
             const container = document.getElementById('userMatchesList');
             const resContainer = document.getElementById('resultsList');
@@ -216,12 +267,16 @@
         });
 
         function openJoinModal(id) {
+            if(!myUid) promptSetProfile();
             activeMatchId = id;
+            document.getElementById('playerName').value = myName;
+            document.getElementById('playerUid').value = myUid;
             document.getElementById('joinModal').classList.remove('hidden');
             document.getElementById('joinModal').classList.add('flex');
         }
 
         function openWalletModal() {
+            if(!myUid) promptSetProfile();
             document.getElementById('walletModal').classList.remove('hidden');
             document.getElementById('walletModal').classList.add('flex');
         }
@@ -232,8 +287,8 @@
         }
 
         function confirmJoin() {
-            const name = document.getElementById('playerName').value;
-            const uid = document.getElementById('playerUid').value;
+            const name = document.getElementById('playerName').value.trim();
+            const uid = document.getElementById('playerUid').value.trim();
             if(!name || !uid) return alert('UID और IGN दोनों भरें!');
 
             db.ref('participants/' + activeMatchId).push({ name, uid, time: Date.now() })
@@ -244,34 +299,56 @@
         }
 
         function submitDeposit() {
-            const userName = document.getElementById('depositUser').value;
-            const uid = document.getElementById('depositUid').value;
-            const amount = document.getElementById('depositAmount').value;
-            const utr = document.getElementById('depositUtr').value;
+            const amount = Number(document.getElementById('depositAmount').value);
+            const utr = document.getElementById('depositUtr').value.trim();
 
-            if(!userName || !amount || !utr) return alert('सभी जानकारी भरें!');
+            if(!myUid) return promptSetProfile();
+            if(!amount || amount <= 0 || !utr) return alert('सही अमाउंट और UTR नंबर भरें!');
 
-            db.ref('deposits').push({ userName, uid, amount, utr, status: 'pending', time: Date.now() })
+            db.ref('deposits').push({ userName: myName, uid: myUid, amount, utr, status: 'pending', time: Date.now() })
                 .then(() => {
-                    alert('ऐड मनी रिक्वेस्ट सबमिट हो गई! एडमिन जल्द ही चेक करके अप्रूव करेगा।');
+                    alert('ऐड मनी रिक्वेस्ट सबमिट हो गई! एडमिन अप्रूव करते ही बैलेंस जुड़ जाएगा।');
                     closeModal('walletModal');
+                    document.getElementById('depositAmount').value = '';
+                    document.getElementById('depositUtr').value = '';
                 });
         }
 
+        // ==========================================
+        // STRICT WITHDRAWAL VALIDATION
+        // ==========================================
         function submitWithdraw() {
-            const userName = document.getElementById('wthUser').value;
-            const uid = document.getElementById('wthUid').value;
-            const amount = document.getElementById('wthAmount').value;
-            const upi = document.getElementById('wthUpi').value;
+            const amount = Number(document.getElementById('wthAmount').value);
+            const upi = document.getElementById('wthUpi').value.trim();
 
-            if(!userName || !amount || !upi) return alert('सभी जानकारी (नाम, अमाउंट, UPI ID) भरें!');
+            if(!myUid) return promptSetProfile();
+            if(!amount || amount <= 0) return alert('कृपया सही अमाउंट दर्ज करें!');
+            if(!upi) return alert('कृपया अपनी सही UPI ID दर्ज करें!');
 
-            db.ref('withdrawals').push({ userName, uid, amount, upi, status: 'pending', time: Date.now() })
-                .then(() => {
-                    alert('विड्रॉल रिक्वेस्ट सबमिट हो गई! एडमिन आपके UPI पर पैसे ट्रांसफर कर देगा।');
-                    closeModal('walletModal');
-                });
+            // सख्त बैलेंस चेक (जितना कॉइन है उतना ही निकाल सकता है)
+            if(amount > myCurrentBalance) {
+                return alert(`⚠️ आपके पास केवल ₹${myCurrentBalance} हैं!\nआप इससे ज़्यादा विड्रॉल नहीं कर सकते।`);
+            }
+
+            // तुरंत बैलेंस में से अमाउंट घटाना
+            const newBal = myCurrentBalance - amount;
+            db.ref('users/' + myUid).update({ balance: newBal });
+
+            // विड्रॉल रिक्वेस्ट भेजना
+            db.ref('withdrawals').push({
+                userName: myName,
+                uid: myUid,
+                amount: amount,
+                upi: upi,
+                status: 'pending',
+                time: Date.now()
+            }).then(() => {
+                alert(`✅ ₹${amount} की विड्रॉल रिक्वेस्ट भेज दी गई है!\nएडमिन आपके UPI (${upi}) पर पैसे भेज देगा।`);
+                closeModal('walletModal');
+                document.getElementById('wthAmount').value = '';
+                document.getElementById('wthUpi').value = '';
+            });
         }
     </script>
 </body>
-    </html>
+                          </html>
