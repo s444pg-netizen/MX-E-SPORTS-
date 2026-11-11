@@ -8,19 +8,18 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
-<body class="bg-gray-950 text-white min-h-screen pb-20 font-sans">
+<body class="bg-gray-950 text-white min-h-screen pb-24 font-sans select-none">
 
     <!-- ========================================== -->
-    <!-- 1. LOGIN / SIGNUP SCREEN (If Not Logged In) -->
+    <!-- 1. LOGIN / SIGNUP SCREEN                   -->
     <!-- ========================================== -->
     <div id="authScreen" class="fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs shadow-2xl space-y-4 my-auto">
             <div class="text-center">
                 <h1 class="text-2xl font-black text-yellow-500 tracking-wider">MX E-SPORTS</h1>
-                <p class="text-xs text-gray-400">टूर्नामेंट खेलने के लिए लॉगिन करें</p>
+                <p class="text-xs text-gray-400">ऑफिशियल गेमिंग प्लेटफॉर्म</p>
             </div>
 
-            <!-- Login / Signup Tabs -->
             <div class="flex bg-gray-800 p-1 rounded-xl text-xs font-bold text-center gap-1">
                 <button onclick="switchAuthTab('login')" id="authTabLogin" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">लॉगिन</button>
                 <button onclick="switchAuthTab('signup')" id="authTabSignup" class="flex-1 py-1.5 rounded-lg text-gray-400">साइन अप</button>
@@ -33,12 +32,13 @@
                 <button onclick="handleLogin()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-lg text-xs transition">लॉगिन करें</button>
             </div>
 
-            <!-- Signup Form -->
+            <!-- Signup Form with Referral Code -->
             <div id="signupForm" class="space-y-2.5 hidden">
                 <input id="regName" type="text" placeholder="Free Fire IGN (गेम नाम)" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                 <input id="regUid" type="text" placeholder="Free Fire UID (नंबर)" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
-                <input id="regPhone" type="tel" placeholder="WhatsApp / मोबाइल नंबर" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
-                <input id="regPass" type="password" placeholder="नया पासवर्ड बनाएँ" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regPhone" type="tel" placeholder="WhatsApp नंबर" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regPass" type="password" placeholder="नया पासवर्ड" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regRef" type="text" placeholder="रेफरल कोड (वैकल्पिक)" class="w-full p-2 rounded-lg bg-gray-800 border border-dashed border-yellow-500/50 text-xs text-yellow-400 placeholder-gray-500">
                 <button onclick="handleSignup()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-2.5 rounded-lg text-xs transition">अकाउंट बनाएँ</button>
             </div>
         </div>
@@ -48,93 +48,161 @@
     <!-- 2. MAIN APP CONTENT                        -->
     <!-- ========================================== -->
     <div id="appContent" class="hidden">
-        <!-- Header -->
-        <header class="bg-gray-900 border-b border-gray-800 p-3.5 sticky top-0 z-40 shadow-lg">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <button onclick="openProfileModal()" class="w-9 h-9 rounded-full bg-yellow-500/20 border border-yellow-500/50 flex items-center justify-center text-yellow-400 font-black text-sm">
-                        👤
-                    </button>
-                    <div>
-                        <h1 class="text-base font-black text-yellow-500 tracking-wider">MX E-SPORTS</h1>
-                        <p id="headerIgn" class="text-[11px] text-gray-400">Loading...</p>
-                    </div>
+        <!-- Top Header -->
+        <header class="bg-gray-900 border-b border-gray-800 p-3.5 sticky top-0 z-40 shadow-lg flex justify-between items-center">
+            <div>
+                <h1 class="text-base font-black text-yellow-500 tracking-wider">MX E-SPORTS</h1>
+                <p id="headerIgn" class="text-[11px] text-gray-400">लोड हो रहा है...</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-gray-800 border border-yellow-500/40 px-3 py-1 rounded-full text-xs font-black text-yellow-400">
+                    💰 <span id="displayBalance">₹0</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div class="bg-gray-800 border border-yellow-500/40 px-3 py-1 rounded-full text-xs font-black text-yellow-400">
-                        💰 <span id="displayBalance">₹0</span>
-                    </div>
-                    <button onclick="openWalletModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-1 rounded-full text-xs font-black shadow-md hover:opacity-90">
-                        वॉलेट
-                    </button>
-                </div>
+                <button onclick="openWalletModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-1 rounded-full text-xs font-black shadow-md hover:opacity-90">
+                    + ऐड / विड्रॉल
+                </button>
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
-        <div class="flex border-b border-gray-800 bg-gray-900/60 text-xs font-bold text-center">
-            <button onclick="switchTab('matches')" id="tabMatches" class="flex-1 py-3 border-b-2 border-yellow-500 text-yellow-500">🏆 लाइव टूर्नामेंट्स</button>
-            <button onclick="switchTab('results')" id="tabResults" class="flex-1 py-3 text-gray-400">📜 रिजल्ट्स (Winners)</button>
-        </div>
-
-        <!-- Matches Tab -->
-        <main id="matchesTabContent" class="max-w-md mx-auto p-4 space-y-4">
-            <div id="userMatchesList" class="space-y-4">
-                <p class="text-gray-500 text-center py-8 text-sm animate-pulse">मैचेस लोड हो रहे हैं...</p>
-            </div>
-        </main>
-
-        <!-- Results Tab -->
-        <main id="resultsTabContent" class="max-w-md mx-auto p-4 space-y-4 hidden">
-            <div id="resultsList" class="space-y-3">
-                <p class="text-gray-500 text-center py-6 text-sm">अभी कोई रिजल्ट नहीं है।</p>
-            </div>
-        </main>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 3. PROFILE SETTINGS MODAL                  -->
-    <!-- ========================================== -->
-    <div id="profileModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                <h3 class="font-bold text-yellow-400 text-base">👤 प्रोफाइल सेटिंग्स</h3>
-                <button onclick="closeModal('profileModal')" class="text-gray-400 hover:text-white font-bold text-lg">&times;</button>
+        <!-- VIEW 1: TOURNAMENTS (HOME) -->
+        <section id="viewMatches" class="max-w-md mx-auto p-4 space-y-4">
+            <!-- Sub Tab (Upcoming / Results) -->
+            <div class="flex bg-gray-900 p-1 rounded-xl text-xs font-bold text-center border border-gray-800">
+                <button onclick="toggleMatchSubTab('upcoming')" id="subTabUpcoming" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">🔥 अपकमिंग मैचेस</button>
+                <button onclick="toggleMatchSubTab('results')" id="subTabResults" class="flex-1 py-1.5 rounded-lg text-gray-400">👑 रिजल्ट्स (Winners)</button>
             </div>
 
-            <!-- Profile Info Card -->
-            <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 text-xs space-y-1.5">
-                <p><span class="text-gray-400">Free Fire UID:</span> <span id="profUid" class="font-mono text-yellow-400 font-bold"></span></p>
-                <p><span class="text-gray-400">कुल बैलेंस:</span> <span id="profBal" class="text-green-400 font-bold font-mono">₹0</span></p>
-                <p><span class="text-gray-400">फोन नंबर:</span> <span id="profPhone" class="text-white"></span></p>
-            </div>
+            <!-- Matches List -->
+            <div id="userMatchesList" class="space-y-4"></div>
+            <div id="resultsList" class="space-y-3 hidden"></div>
+        </section>
 
-            <!-- Edit IGN Form -->
-            <div class="space-y-2">
-                <p class="text-[11px] text-gray-400">इन-गेम नाम (IGN) बदलें:</p>
-                <input id="editNameInput" type="text" placeholder="नया Free Fire नाम" class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-xs text-white">
-                <button onclick="saveProfileChanges()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 rounded text-xs transition">सेव करें</button>
+        <!-- VIEW 2: LEADERBOARD -->
+        <section id="viewLeaderboard" class="max-w-md mx-auto p-4 space-y-4 hidden">
+            <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 p-4 rounded-2xl border border-yellow-500/30 text-center">
+                <h2 class="text-lg font-black text-yellow-400">🏆 टॉप लीडरबोर्ड</h2>
+                <p class="text-xs text-gray-300">MX E-SPORTS के सबसे बड़े विजेता खिलाड़ी</p>
             </div>
+            <div id="leaderboardList" class="space-y-2">
+                <p class="text-gray-500 text-center py-6 text-xs">लोड हो रहा है...</p>
+            </div>
+        </section>
 
-            <button onclick="handleLogout()" class="w-full bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-800/60 font-bold py-2 rounded text-xs transition">
-                लॉगआउट (Logout)
+        <!-- VIEW 3: REFER & EARN -->
+        <section id="viewRefer" class="max-w-md mx-auto p-4 space-y-4 hidden">
+            <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 text-center space-y-3 shadow-xl">
+                <span class="text-4xl">🎁</span>
+                <h2 class="text-lg font-black text-yellow-400">दोस्तों को रेफर करें और कमाएँ</h2>
+                <p class="text-xs text-gray-400">जब आपका दोस्त आपके रेफरल कोड से साइन अप करेगा, तो आपको ₹5 बोनस कॉइन मिलेंगे!</p>
+                
+                <div class="bg-gray-950 p-3 rounded-xl border border-dashed border-yellow-500/50">
+                    <p class="text-[10px] text-gray-400">आपका पर्सनल रेफरल कोड:</p>
+                    <p id="myReferCode" class="text-lg font-black text-yellow-400 font-mono tracking-widest select-all"></p>
+                </div>
+
+                <button onclick="shareReferral()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg">
+                    <span>📲 WhatsApp पर शेयर करें</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 4: SETTINGS -->
+        <section id="viewSettings" class="max-w-md mx-auto p-4 space-y-4 hidden">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-4 shadow-xl">
+                <h2 class="text-base font-bold text-yellow-400">⚙️ यूजर सेटिंग्स</h2>
+                
+                <!-- Profile Info -->
+                <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 text-xs space-y-1.5">
+                    <p><span class="text-gray-400">Free Fire UID:</span> <span id="setUid" class="font-mono text-yellow-400 font-bold"></span></p>
+                    <p><span class="text-gray-400">मोबाइल नंबर:</span> <span id="setPhone" class="text-white"></span></p>
+                    <p><span class="text-gray-400">वॉलेट बैलेंस:</span> <span id="setBal" class="text-green-400 font-bold font-mono">₹0</span></p>
+                </div>
+
+                <!-- Edit IGN -->
+                <div class="space-y-2">
+                    <p class="text-[11px] text-gray-400">गेम का नाम (IGN) बदलें:</p>
+                    <div class="flex gap-2">
+                        <input id="editNameInput" type="text" placeholder="नया नाम" class="flex-1 p-2 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                        <button onclick="saveNameChange()" class="bg-yellow-500 text-black font-bold px-3 py-2 rounded-lg text-xs">सेव</button>
+                    </div>
+                </div>
+
+                <!-- Support & Rules -->
+                <div class="space-y-2 pt-2 border-t border-gray-800 text-xs">
+                    <a href="https://wa.me/917985589166" target="_blank" class="block w-full text-center bg-gray-800 hover:bg-gray-700 border border-gray-700 text-green-400 font-bold py-2 rounded-lg">
+                        💬 कस्टमर सपोर्ट (WhatsApp)
+                    </a>
+                    <button onclick="alert('नियम:\n1. कोई हैकर अलाउड नहीं है।\n2. मैच शुरू होने से 10 मिनट पहले रूम में आएँ।\n3. गलत रिजल्ट भेजने पर आईडी बैन होगी।')" class="w-full text-center bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 font-bold py-2 rounded-lg">
+                        📜 टूर्नामेंट नियम
+                    </button>
+                </div>
+
+                <button onclick="handleLogout()" class="w-full bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-800/60 font-bold py-2.5 rounded-xl text-xs transition">
+                    लॉगआउट (Logout)
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- BOTTOM NAVIGATION BAR (4 MENUS)            -->
+        <!-- ========================================== -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-800 flex justify-around items-center py-2 px-1 z-40 max-w-md mx-auto">
+            <button onclick="navSwitch('matches')" id="navMatches" class="flex flex-col items-center text-yellow-500">
+                <span class="text-lg">🎮</span>
+                <span class="text-[10px] font-bold">टूर्नामेंट्स</span>
             </button>
+            <button onclick="navSwitch('leaderboard')" id="navLeaderboard" class="flex flex-col items-center text-gray-400">
+                <span class="text-lg">🏆</span>
+                <span class="text-[10px] font-bold">लीडरबोर्ड</span>
+            </button>
+            <button onclick="navSwitch('refer')" id="navRefer" class="flex flex-col items-center text-gray-400">
+                <span class="text-lg">🎁</span>
+                <span class="text-[10px] font-bold">रेफर & अर्न</span>
+            </button>
+            <button onclick="navSwitch('settings')" id="navSettings" class="flex flex-col items-center text-gray-400">
+                <span class="text-lg">⚙️</span>
+                <span class="text-[10px] font-bold">सेटिंग्स</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. JOIN MODAL (SOLO & DUO SUPPORT)         -->
+    <!-- ========================================== -->
+    <div id="joinModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
+            <h3 class="font-bold text-yellow-400 text-base">मैच में एंट्री लें</h3>
+            <p id="joinFeeWarning" class="text-[11px] text-orange-400 font-semibold"></p>
+
+            <!-- Player 1 (Logged-in User) -->
+            <div class="space-y-1.5">
+                <p class="text-[10px] text-gray-400">प्लेयर 1 (आप):</p>
+                <input id="joinP1Name" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-xs text-white" readonly>
+                <input id="joinP1Uid" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-xs text-yellow-400 font-mono" readonly>
+            </div>
+
+            <!-- Player 2 (Only if DUO) -->
+            <div id="duoFields" class="space-y-1.5 pt-1 border-t border-gray-800 hidden">
+                <p class="text-[10px] text-yellow-400 font-bold">प्लेयर 2 (टीममेट):</p>
+                <input id="joinP2Name" type="text" placeholder="प्लेयर 2 का गेम नाम (IGN)" class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="joinP2Uid" type="text" placeholder="प्लेयर 2 की Free Fire UID" class="w-full p-2 rounded bg-gray-800 border border-gray-700 text-xs text-white">
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="processMatchJoin()" class="flex-1 bg-yellow-500 text-black font-black py-2 rounded-lg text-xs hover:bg-yellow-600">कन्फर्म जॉइन (Coin Pay)</button>
+                <button onclick="closeModal('joinModal')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-xs">कैंसिल</button>
+            </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- 4. JOIN MATCH MODAL                        -->
+    <!-- 4. VIEW PLAYERS MODAL (ALL JOINED PLAYERS) -->
     <!-- ========================================== -->
-    <div id="joinModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs space-y-3 shadow-2xl">
-            <h3 class="font-bold text-yellow-400 text-base">मैच में एंट्री लें</h3>
-            <p class="text-[11px] text-gray-400">आपकी प्रोफाइल से UID और नाम सेट है:</p>
-            <input id="playerName" type="text" placeholder="IGN" class="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none">
-            <input id="playerUid" type="text" placeholder="UID" class="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none" readonly>
-            <div class="flex gap-2 pt-2">
-                <button onclick="confirmJoin()" class="flex-1 bg-yellow-500 text-black font-bold py-2 rounded-lg text-xs hover:bg-yellow-600">जॉइन कन्फर्म</button>
-                <button onclick="closeModal('joinModal')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-xs hover:bg-gray-700">कैंसिल</button>
-            </div>
+    <div id="viewPlayersModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs max-h-[75vh] flex flex-col shadow-2xl">
+            <h3 class="font-bold text-yellow-400 text-sm mb-2">👥 इस मैच के खिलाड़ी</h3>
+            <div id="joinedPlayersContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800"></div>
+            <button onclick="closeModal('viewPlayersModal')" class="mt-3 bg-gray-800 text-white font-bold py-2 rounded-lg text-xs">बंद करें</button>
         </div>
     </div>
 
@@ -151,7 +219,6 @@
                 <button onclick="closeModal('walletModal')" class="text-gray-400 hover:text-white font-bold text-lg">&times;</button>
             </div>
 
-            <!-- Sub Tabs -->
             <div class="flex bg-gray-800 p-1 rounded-xl text-xs font-bold text-center gap-1">
                 <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">➕ Add Money</button>
                 <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white">💸 Withdraw</button>
@@ -180,7 +247,7 @@
             <div id="withdrawSection" class="space-y-3 hidden">
                 <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700/60 text-[11px] text-gray-300 space-y-0.5">
                     <p class="text-yellow-400 font-bold">⚠️ विड्रॉल नियम:</p>
-                    <p>• आप केवल अपने बैलेंस (₹<span id="wthMax">0</span>) जितना ही निकाल सकते हैं।</p>
+                    <p>• आप केवल अपने बैलेंस जितना ही निकाल सकते हैं।</p>
                     <p>• सही UPI ID डालें।</p>
                 </div>
 
@@ -208,27 +275,17 @@
 
         let currentUser = null;
         let myCurrentBalance = 0;
-        let activeMatchId = null;
+        let activeMatch = null;
 
-        // Check Login Status on Page Load
+        // Check Login Session
         window.onload = function() {
             const savedUid = localStorage.getItem('mx_auth_uid');
             if(savedUid) {
                 loadUserData(savedUid);
             } else {
-                showAuthScreen();
+                document.getElementById('authScreen').classList.remove('hidden');
             }
         };
-
-        function showAuthScreen() {
-            document.getElementById('authScreen').classList.remove('hidden');
-            document.getElementById('appContent').classList.add('hidden');
-        }
-
-        function showAppContent() {
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('appContent').classList.remove('hidden');
-        }
 
         function switchAuthTab(type) {
             if(type === 'login') {
@@ -244,22 +301,33 @@
             }
         }
 
-        // SIGNUP
+        // SIGNUP WITH REFERRAL
         function handleSignup() {
             const name = document.getElementById('regName').value.trim();
             const uid = document.getElementById('regUid').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const pass = document.getElementById('regPass').value.trim();
+            const refCode = document.getElementById('regRef').value.trim();
 
             if(!name || !uid || !phone || !pass) return alert('सभी बॉक्स भरें!');
 
             db.ref('users/' + uid).once('value', snap => {
-                if(snap.exists()) {
-                    return alert('इस Free Fire UID से पहले ही अकाउंट बना हुआ है! कृपया लॉगिन करें।');
-                }
+                if(snap.exists()) return alert('इस UID से पहले ही अकाउंट बना हुआ है!');
+
                 const userData = { name, uid, phone, pass, balance: 0, createdAt: Date.now() };
+                
+                // If valid referral code
+                if(refCode && refCode !== uid) {
+                    db.ref('users/' + refCode).once('value', rSnap => {
+                        if(rSnap.exists()) {
+                            const curRBal = Number(rSnap.val().balance || 0);
+                            db.ref('users/' + refCode).update({ balance: curRBal + 5 }); // ₹5 referral bonus
+                        }
+                    });
+                }
+
                 db.ref('users/' + uid).set(userData).then(() => {
-                    alert('🎉 अकाउंट सफलतापूर्वक बन गया!');
+                    alert('🎉 अकाउंट बन गया!');
                     localStorage.setItem('mx_auth_uid', uid);
                     loadUserData(uid);
                 });
@@ -270,12 +338,11 @@
         function handleLogin() {
             const uid = document.getElementById('loginUid').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-
-            if(!uid || !pass) return alert('UID और पासवर्ड दोनों भरें!');
+            if(!uid || !pass) return alert('UID और पासवर्ड भरें!');
 
             db.ref('users/' + uid).once('value', snap => {
                 const user = snap.val();
-                if(!user) return alert('यह अकाउंट नहीं मिला! कृपया पहले साइन अप करें।');
+                if(!user) return alert('अकाउंट नहीं मिला! कृपया साइन अप करें।');
                 if(user.pass !== pass) return alert('गलत पासवर्ड!');
 
                 localStorage.setItem('mx_auth_uid', uid);
@@ -283,86 +350,67 @@
             });
         }
 
-        // LOAD USER & LISTEN BALANCE
         function loadUserData(uid) {
             db.ref('users/' + uid).on('value', snap => {
                 currentUser = snap.val();
-                if(!currentUser) {
-                    handleLogout();
-                    return;
-                }
+                if(!currentUser) return handleLogout();
+
                 myCurrentBalance = Number(currentUser.balance || 0);
 
-                // Update UI Elements
                 document.getElementById('headerIgn').innerText = `${currentUser.name} (UID: ${currentUser.uid})`;
                 document.getElementById('displayBalance').innerText = '₹' + myCurrentBalance;
                 document.getElementById('modalBalance').innerText = '₹' + myCurrentBalance;
-                document.getElementById('wthMax').innerText = myCurrentBalance;
 
-                // Profile Modal Info
-                document.getElementById('profUid').innerText = currentUser.uid;
-                document.getElementById('profBal').innerText = '₹' + myCurrentBalance;
-                document.getElementById('profPhone').innerText = currentUser.phone || 'N/A';
+                // Settings View
+                document.getElementById('setUid').innerText = currentUser.uid;
+                document.getElementById('setPhone').innerText = currentUser.phone || 'N/A';
+                document.getElementById('setBal').innerText = '₹' + myCurrentBalance;
                 document.getElementById('editNameInput').value = currentUser.name;
 
-                showAppContent();
+                // Refer View
+                document.getElementById('myReferCode').innerText = currentUser.uid;
+
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('appContent').classList.remove('hidden');
             });
         }
 
-        // PROFILE SETTINGS
-        function openProfileModal() {
-            document.getElementById('profileModal').classList.remove('hidden');
-            document.getElementById('profileModal').classList.add('flex');
-        }
+        // BOTTOM NAVIGATION SWITCHER
+        function navSwitch(view) {
+            ['viewMatches', 'viewLeaderboard', 'viewRefer', 'viewSettings'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['navMatches', 'navLeaderboard', 'navRefer', 'navSettings'].forEach(id => document.getElementById(id).className = "flex flex-col items-center text-gray-400");
 
-        function saveProfileChanges() {
-            const newName = document.getElementById('editNameInput').value.trim();
-            if(!newName) return alert('नाम खाली नहीं हो सकता!');
-            db.ref('users/' + currentUser.uid).update({ name: newName }).then(() => {
-                alert('इन-गेम नाम अपडेट हो गया!');
-                closeModal('profileModal');
-            });
-        }
-
-        function handleLogout() {
-            if(confirm('क्या आप सच में लॉगआउट करना चाहते हैं?')) {
-                localStorage.removeItem('mx_auth_uid');
-                currentUser = null;
-                closeModal('profileModal');
-                showAuthScreen();
+            if(view === 'matches') {
+                document.getElementById('viewMatches').classList.remove('hidden');
+                document.getElementById('navMatches').className = "flex flex-col items-center text-yellow-500";
+            } else if(view === 'leaderboard') {
+                document.getElementById('viewLeaderboard').classList.remove('hidden');
+                document.getElementById('navLeaderboard').className = "flex flex-col items-center text-yellow-500";
+                loadLeaderboard();
+            } else if(view === 'refer') {
+                document.getElementById('viewRefer').classList.remove('hidden');
+                document.getElementById('navRefer').className = "flex flex-col items-center text-yellow-500";
+            } else if(view === 'settings') {
+                document.getElementById('viewSettings').classList.remove('hidden');
+                document.getElementById('navSettings').className = "flex flex-col items-center text-yellow-500";
             }
         }
 
-        // TABS SWITCHER
-        function switchTab(tab) {
-            if(tab === 'matches') {
-                document.getElementById('matchesTabContent').classList.remove('hidden');
-                document.getElementById('resultsTabContent').classList.add('hidden');
-                document.getElementById('tabMatches').className = "flex-1 py-3 border-b-2 border-yellow-500 text-yellow-500 font-bold";
-                document.getElementById('tabResults').className = "flex-1 py-3 text-gray-400 font-bold";
+        function toggleMatchSubTab(sub) {
+            if(sub === 'upcoming') {
+                document.getElementById('userMatchesList').classList.remove('hidden');
+                document.getElementById('resultsList').classList.add('hidden');
+                document.getElementById('subTabUpcoming').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black";
+                document.getElementById('subTabResults').className = "flex-1 py-1.5 rounded-lg text-gray-400";
             } else {
-                document.getElementById('matchesTabContent').classList.add('hidden');
-                document.getElementById('resultsTabContent').classList.remove('hidden');
-                document.getElementById('tabResults').className = "flex-1 py-3 border-b-2 border-yellow-500 text-yellow-500 font-bold";
-                document.getElementById('tabMatches').className = "flex-1 py-3 text-gray-400 font-bold";
+                document.getElementById('userMatchesList').classList.add('hidden');
+                document.getElementById('resultsList').classList.remove('hidden');
+                document.getElementById('subTabResults').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black";
+                document.getElementById('subTabUpcoming').className = "flex-1 py-1.5 rounded-lg text-gray-400";
             }
         }
 
-        function toggleWalletView(view) {
-            if(view === 'deposit') {
-                document.getElementById('depositSection').classList.remove('hidden');
-                document.getElementById('withdrawSection').classList.add('hidden');
-                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
-                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white font-bold";
-            } else {
-                document.getElementById('depositSection').classList.add('hidden');
-                document.getElementById('withdrawSection').classList.remove('hidden');
-                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
-                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white font-bold";
-            }
-        }
-
-        // LOAD MATCHES
+        // LOAD MATCHES & CHECK DUPLICATE JOIN LIVE
         db.ref('matches').on('value', snapshot => {
             const container = document.getElementById('userMatchesList');
             const resContainer = document.getElementById('resultsList');
@@ -394,28 +442,50 @@
                     db.ref('participants/' + id).on('value', pSnap => {
                         const joined = pSnap.numChildren();
                         const percent = Math.min((joined / m.slots) * 100, 100);
+                        
+                        // Check if current user already joined
+                        let alreadyJoined = false;
+                        pSnap.forEach(child => {
+                            if(child.val().p1Uid === currentUser?.uid || child.val().p2Uid === currentUser?.uid) {
+                                alreadyJoined = true;
+                            }
+                        });
+
+                        const isDuo = (m.title.toLowerCase().includes('duo'));
+
                         container.innerHTML += `
                             <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-xl">
                                 <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-bold text-white text-base">${m.title}</h3>
+                                    <div>
+                                        <h3 class="font-bold text-white text-base">${m.title}</h3>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isDuo ? 'bg-purple-900/40 text-purple-400 border border-purple-700/50' : 'bg-blue-900/40 text-blue-400 border border-blue-700/50'}">${isDuo ? '👥 DUO MATCH' : '👤 SOLO MATCH'}</span>
+                                    </div>
                                     <span class="bg-orange-500/20 text-orange-400 text-xs px-2.5 py-0.5 rounded-full font-black border border-orange-500/30">फीस: ₹${m.fee}</span>
                                 </div>
-                                <p class="text-xs text-gray-400 mb-3">⏰ समय: ${m.time} | 🎁 प्राइज: ₹${m.prize}</p>
+                                <p class="text-xs text-gray-400 mb-2">⏰ समय: ${m.time} | 🎁 प्राइज: ₹${m.prize}</p>
                                 
-                                <div class="w-full bg-gray-800 rounded-full h-2 mb-1.5 overflow-hidden">
+                                <div class="w-full bg-gray-800 rounded-full h-2 mb-1 overflow-hidden">
                                     <div class="bg-yellow-500 h-2 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
                                 </div>
-                                <p class="text-[11px] text-gray-400 mb-3 text-right">स्लॉट्स: <span class="text-yellow-400 font-bold">${joined}/${m.slots}</span></p>
-
-                                <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700/60 mb-3 text-xs space-y-1">
-                                    <p class="text-gray-400 font-bold mb-1">🎮 कस्टम रूम क्रेडेंशियल्स:</p>
-                                    <p class="text-green-400">Room ID: <span class="font-mono text-white select-all font-bold">${m.roomId || 'मैच से 15 मिनट पहले आएगी'}</span></p>
-                                    <p class="text-green-400">Password: <span class="font-mono text-white select-all font-bold">${m.roomPass || 'मैच से 15 मिनट पहले आएगा'}</span></p>
+                                <div class="flex justify-between text-[11px] text-gray-400 mb-3">
+                                    <button onclick="openPlayersModal('${id}')" class="text-yellow-400 hover:underline font-bold">👥 खिलाड़ी देखें (${joined})</button>
+                                    <span>स्लॉट्स: <b class="text-yellow-400">${joined}/${m.slots}</b></span>
                                 </div>
 
-                                <button onclick="openJoinModal('${id}')" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black py-2.5 rounded-xl text-sm hover:opacity-90 shadow-md">
-                                    जॉइन करें (₹${m.fee})
-                                </button>
+                                <div class="bg-gray-800/80 p-2.5 rounded-xl border border-gray-700/60 mb-3 text-xs space-y-0.5">
+                                    <p class="text-green-400 font-semibold">Room ID: <span class="font-mono text-white select-all font-bold">${m.roomId || 'मैच से 15 मिनट पहले आएगी'}</span></p>
+                                    <p class="text-green-400 font-semibold">Password: <span class="font-mono text-white select-all font-bold">${m.roomPass || 'मैच से 15 मिनट पहले आएगा'}</span></p>
+                                </div>
+
+                                ${alreadyJoined ? 
+                                    `<button class="w-full bg-gray-800 text-green-400 font-black py-2.5 rounded-xl text-xs border border-green-500/40 cursor-not-allowed">
+                                        ✅ आप इस मैच में पहले से जॉइन हैं
+                                    </button>` 
+                                    : 
+                                    `<button onclick="openJoinModal('${id}')" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black py-2.5 rounded-xl text-xs hover:opacity-90 shadow-md">
+                                        जॉइन करें (₹${isDuo ? m.fee * 2 + ' for Duo' : m.fee})
+                                    </button>`
+                                }
                             </div>
                         `;
                     });
@@ -423,13 +493,162 @@
             }
         });
 
-        // JOIN MODAL
+        // JOIN MODAL OPEN
         function openJoinModal(id) {
-            activeMatchId = id;
-            document.getElementById('playerName').value = currentUser.name;
-            document.getElementById('playerUid').value = currentUser.uid;
-            document.getElementById('joinModal').classList.remove('hidden');
-            document.getElementById('joinModal').classList.add('flex');
+            db.ref('matches/' + id).once('value', snap => {
+                activeMatch = snap.val();
+                activeMatch.id = id;
+
+                const isDuo = activeMatch.title.toLowerCase().includes('duo');
+                const totalCost = isDuo ? Number(activeMatch.fee) * 2 : Number(activeMatch.fee);
+
+                document.getElementById('joinFeeWarning').innerText = `एंट्री फीस: ₹${totalCost} (आपके वॉलेट से कटेंगे)`;
+                document.getElementById('joinP1Name').value = currentUser.name;
+                document.getElementById('joinP1Uid').value = currentUser.uid;
+
+                if(isDuo) {
+                    document.getElementById('duoFields').classList.remove('hidden');
+                } else {
+                    document.getElementById('duoFields').classList.add('hidden');
+                }
+
+                document.getElementById('joinModal').classList.remove('hidden');
+                document.getElementById('joinModal').classList.add('flex');
+            });
+        }
+
+        // ==========================================
+        // AUTO DEDUCT COIN & SUBMIT JOIN
+        // ==========================================
+        function processMatchJoin() {
+            if(!activeMatch) return;
+            const isDuo = activeMatch.title.toLowerCase().includes('duo');
+            const totalCost = isDuo ? Number(activeMatch.fee) * 2 : Number(activeMatch.fee);
+
+            // 1. Check Balance
+            if(myCurrentBalance < totalCost) {
+                alert(`⚠️ अपर्याप्त बैलेंस!\nइस मैच के लिए ₹${totalCost} चाहिए, लेकिन आपके पास सिर्फ ₹${myCurrentBalance} हैं।\nकृपया पहले वॉलेट में पैसे जोड़ें।`);
+                closeModal('joinModal');
+                openWalletModal();
+                return;
+            }
+
+            // 2. Validate Duo if needed
+            let p2Name = "", p2Uid = "";
+            if(isDuo) {
+                p2Name = document.getElementById('joinP2Name').value.trim();
+                p2Uid = document.getElementById('joinP2Uid').value.trim();
+                if(!p2Name || !p2Uid) return alert('कृपया अपने Duo प्लेयर 2 का नाम और UID भरें!');
+            }
+
+            // 3. Prevent Duplicate Join
+            db.ref('participants/' + activeMatch.id).once('value', pSnap => {
+                let duplicate = false;
+                pSnap.forEach(child => {
+                    const c = child.val();
+                    if(c.p1Uid === currentUser.uid || c.p2Uid === currentUser.uid) duplicate = true;
+                });
+
+                if(duplicate) {
+                    return alert('आप इस मैच में पहले ही जॉइन हो चुके हैं!');
+                }
+
+                // 4. Auto Deduct Balance
+                const newBalance = myCurrentBalance - totalCost;
+                db.ref('users/' + currentUser.uid).update({ balance: newBalance });
+
+                // 5. Add Participant Record
+                db.ref('participants/' + activeMatch.id).push({
+                    p1Name: currentUser.name,
+                    p1Uid: currentUser.uid,
+                    p2Name: p2Name || null,
+                    p2Uid: p2Uid || null,
+                    type: isDuo ? 'Duo' : 'Solo',
+                    time: Date.now()
+                }).then(() => {
+                    alert(`🎉 मैच सफलतापूर्वक जॉइन हो गया!\n₹${totalCost} आपके वॉलेट से काट लिए गए हैं।`);
+                    closeModal('joinModal');
+                });
+            });
+        }
+
+        // VIEW JOINED PLAYERS
+        function openPlayersModal(matchId) {
+            db.ref('participants/' + matchId).once('value', snap => {
+                const list = document.getElementById('joinedPlayersContent');
+                list.innerHTML = '';
+                const data = snap.val();
+                if(!data) {
+                    list.innerHTML = '<p class="text-gray-400 py-4 text-center">अभी तक किसी ने जॉइन नहीं किया।</p>';
+                } else {
+                    let i = 1;
+                    for(let key in data) {
+                        const p = data[key];
+                        list.innerHTML += `
+                            <div class="py-1.5">
+                                <p class="font-bold text-white">${i++}. ${p.p1Name} <span class="text-yellow-400 font-mono text-[10px]">(${p.p1Uid})</span></p>
+                                ${p.p2Name ? `<p class="text-[10px] text-gray-400 pl-3">↳ Team: ${p.p2Name} (${p.p2Uid})</p>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+                document.getElementById('viewPlayersModal').classList.remove('hidden');
+                document.getElementById('viewPlayersModal').classList.add('flex');
+            });
+        }
+
+        // LEADERBOARD LOAD
+        function loadLeaderboard() {
+            db.ref('users').once('value', snap => {
+                const list = document.getElementById('leaderboardList');
+                list.innerHTML = '';
+                const users = [];
+                snap.forEach(c => users.push(c.val()));
+
+                users.sort((a,b) => Number(b.balance || 0) - Number(a.balance || 0));
+
+                users.slice(0, 10).forEach((u, idx) => {
+                    let badge = `#${idx + 1}`;
+                    if(idx === 0) badge = '🥇 1st';
+                    if(idx === 1) badge = '🥈 2nd';
+                    if(idx === 2) badge = '🥉 3rd';
+
+                    list.innerHTML += `
+                        <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex justify-between items-center shadow">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-bold text-xs ${idx < 3 ? 'text-yellow-400' : 'text-gray-400'}">${badge}</span>
+                                <div>
+                                    <p class="font-bold text-xs text-white">${u.name}</p>
+                                    <p class="text-[10px] text-gray-400 font-mono">UID: ${u.uid}</p>
+                                </div>
+                            </div>
+                            <span class="text-green-400 font-bold font-mono text-xs">₹${u.balance || 0}</span>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // SHARE REFERRAL VIA WHATSAPP
+        function shareReferral() {
+            const code = currentUser.uid;
+            const text = encodeURIComponent(`🔥 MX E-SPORTS Free Fire Tournament App डाउनलोड करो और फ्री में टूर्नामेंट खेलो!\n\nसाइन अप करते समय मेरा रेफरल कोड डालें: ${code}\nडाउनलोड लिंक: https://s444pg-netizen.github.io/MX-E-SPORTS-/`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        function saveNameChange() {
+            const newName = document.getElementById('editNameInput').value.trim();
+            if(!newName) return alert('नाम खाली नहीं हो सकता!');
+            db.ref('users/' + currentUser.uid).update({ name: newName }).then(() => {
+                alert('इन-गेम नाम बदल दिया गया!');
+            });
+        }
+
+        function handleLogout() {
+            if(confirm('क्या आप सच में लॉगआउट करना चाहते हैं?')) {
+                localStorage.removeItem('mx_auth_uid');
+                location.reload();
+            }
         }
 
         function closeModal(id) {
@@ -437,72 +656,54 @@
             document.getElementById(id).classList.remove('flex');
         }
 
-        function confirmJoin() {
-            const name = document.getElementById('playerName').value.trim();
-            const uid = currentUser.uid;
-            if(!name || !uid) return alert('नाम खाली नहीं हो सकता!');
-
-            db.ref('participants/' + activeMatchId).push({ name, uid, time: Date.now() })
-                .then(() => {
-                    alert('सफलतापूर्वक मैच में जॉइन हो गए!');
-                    closeModal('joinModal');
-                });
-        }
-
-        // WALLET MODAL
         function openWalletModal() {
             document.getElementById('walletModal').classList.remove('hidden');
             document.getElementById('walletModal').classList.add('flex');
         }
 
+        function toggleWalletView(view) {
+            if(view === 'deposit') {
+                document.getElementById('depositSection').classList.remove('hidden');
+                document.getElementById('withdrawSection').classList.add('hidden');
+                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
+                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white font-bold";
+            } else {
+                document.getElementById('depositSection').classList.add('hidden');
+                document.getElementById('withdrawSection').classList.remove('hidden');
+                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
+                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white font-bold";
+            }
+        }
+
         function submitDeposit() {
             const amount = Number(document.getElementById('depositAmount').value);
             const utr = document.getElementById('depositUtr').value.trim();
-
             if(!amount || amount <= 0 || !utr) return alert('सही अमाउंट और UTR नंबर भरें!');
 
-            db.ref('deposits').push({ 
-                userName: currentUser.name, 
-                uid: currentUser.uid, 
-                amount, 
-                utr, 
-                status: 'pending', 
-                time: Date.now() 
-            }).then(() => {
-                alert('ऐड मनी रिक्वेस्ट सबमिट हो गई! एडमिन अप्रूव करते ही बैलेंस जुड़ जाएगा।');
-                closeModal('walletModal');
-                document.getElementById('depositAmount').value = '';
-                document.getElementById('depositUtr').value = '';
-            });
+            db.ref('deposits').push({ userName: currentUser.name, uid: currentUser.uid, amount, utr, status: 'pending', time: Date.now() })
+                .then(() => {
+                    alert('ऐड मनी रिक्वेस्ट सबमिट हो गई! एडमिन जल्द ही चेक करके अप्रूव करेगा।');
+                    closeModal('walletModal');
+                    document.getElementById('depositAmount').value = '';
+                    document.getElementById('depositUtr').value = '';
+                });
         }
 
         function submitWithdraw() {
             const amount = Number(document.getElementById('wthAmount').value);
             const upi = document.getElementById('wthUpi').value.trim();
+            if(!amount || amount <= 0 || !upi) return alert('सही अमाउंट और UPI भरें!');
 
-            if(!amount || amount <= 0) return alert('कृपया सही अमाउंट दर्ज करें!');
-            if(!upi) return alert('कृपया अपनी सही UPI ID दर्ज करें!');
+            if(amount > myCurrentBalance) return alert(`आपके पास सिर्फ ₹${myCurrentBalance} हैं!`);
 
-            if(amount > myCurrentBalance) {
-                return alert(`⚠️ आपके पास केवल ₹${myCurrentBalance} हैं!\nआप इससे ज़्यादा विड्रॉल नहीं कर सकते।`);
-            }
-
-            const newBal = myCurrentBalance - amount;
-            db.ref('users/' + currentUser.uid).update({ balance: newBal });
-
-            db.ref('withdrawals').push({
-                userName: currentUser.name,
-                uid: currentUser.uid,
-                amount: amount,
-                upi: upi,
-                status: 'pending',
-                time: Date.now()
-            }).then(() => {
-                alert(`✅ ₹${amount} की विड्रॉल रिक्वेस्ट भेज दी गई है!\nएडमिन आपके UPI (${upi}) पर पैसे भेज देगा।`);
-                closeModal('walletModal');
-                document.getElementById('wthAmount').value = '';
-                document.getElementById('wthUpi').value = '';
-            });
+            db.ref('users/' + currentUser.uid).update({ balance: myCurrentBalance - amount });
+            db.ref('withdrawals').push({ userName: currentUser.name, uid: currentUser.uid, amount, upi, status: 'pending', time: Date.now() })
+                .then(() => {
+                    alert('विड्रॉल रिक्वेस्ट सबमिट हो गई!');
+                    closeModal('walletModal');
+                    document.getElementById('wthAmount').value = '';
+                    document.getElementById('wthUpi').value = '';
+                });
         }
     </script>
 </body>
