@@ -3,90 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MX E-SPORTS - Admin Panel</title>
+    <title>MX E-SPORTS - Master Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-4">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold text-yellow-500 mb-6 text-center">🔥 MX E-SPORTS ADMIN PANEL</h1>
+<body class="bg-gray-950 text-white min-h-screen p-4">
+    <!-- Security Lock Screen -->
+    <div id="lockScreen" class="fixed inset-0 bg-black flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4">
+            <h2 class="text-xl font-bold text-yellow-500">🔒 Admin Access</h2>
+            <p class="text-xs text-gray-400">एडमिन पिन दर्ज करें (Default: 1234)</p>
+            <input id="adminPin" type="password" placeholder="Enter PIN" class="w-full p-2.5 rounded bg-gray-800 border border-gray-700 text-center tracking-widest text-lg focus:outline-none">
+            <button onclick="checkPin()" class="w-full bg-yellow-500 text-black font-bold py-2 rounded">लॉगिन करें</button>
+        </div>
+    </div>
 
-        <!-- Create Tournament Form -->
-        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 mb-8 shadow-lg">
-            <h2 class="text-xl font-semibold mb-4 text-orange-400">➕ नया मैच बनाएँ</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input id="title" type="text" placeholder="मैच का नाम (उदा: Solo Bermuda)" class="p-2.5 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                <input id="fee" type="number" placeholder="एंट्री फीस (₹)" class="p-2.5 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" class="p-2.5 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                <button onclick="createMatch()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2.5 rounded transition">मैच पब्लिश करें</button>
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="max-w-4xl mx-auto hidden pb-20">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-black text-yellow-500">🔥 MX E-SPORTS ADMIN</h1>
+            <button onclick="location.reload()" class="bg-red-600/20 text-red-400 text-xs px-3 py-1.5 rounded border border-red-500/30">लॉगआउट</button>
+        </div>
+
+        <!-- 1. Create Match -->
+        <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 mb-8 shadow-xl">
+            <h2 class="text-lg font-bold mb-4 text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input id="title" type="text" placeholder="मैच नाम (उदा: Solo Bermuda #1)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
+                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
+                <input id="fee" type="number" placeholder="एंट्री फीस (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
+                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
+                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded bg-gray-800 border border-gray-700 text-sm">
+                <button onclick="createMatch()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2.5 rounded text-sm transition">मैच पब्लिश करें</button>
             </div>
         </div>
 
-        <!-- Matches List with Room ID Management -->
-        <h2 class="text-xl font-semibold mb-4 text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
-        <div id="matchesList" class="space-y-4">
-            <!-- Matches will load here dynamically -->
+        <!-- 2. Wallet Deposit Requests -->
+        <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 mb-8 shadow-xl">
+            <h2 class="text-lg font-bold mb-3 text-green-400">💰 वॉलेट रिचार्ज रिक्वेस्ट्स</h2>
+            <div id="depositRequests" class="space-y-2 text-sm">
+                <p class="text-gray-500 text-xs">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>
+            </div>
+        </div>
+
+        <!-- 3. Matches List (Room ID, Players, Results) -->
+        <h2 class="text-lg font-bold mb-4 text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
+        <div id="matchesList" class="space-y-4"></div>
+    </div>
+
+    <!-- Players Modal -->
+    <div id="playersModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col">
+            <h3 class="font-bold text-yellow-400 mb-2">👥 जॉइन किए गए खिलाड़ी</h3>
+            <div id="playersListContent" class="overflow-y-auto flex-1 space-y-2 text-sm divide-y divide-gray-800"></div>
+            <button onclick="closePlayersModal()" class="mt-4 bg-gray-800 text-white font-bold py-2 rounded text-sm">बंद करें</button>
         </div>
     </div>
 
     <script>
-        // अपना Firebase कॉन्फिग यहाँ पेस्ट करें
+        // अपना Firebase Config यहाँ पेस्ट करें
         const firebaseConfig = {
-            apiKey: "1:490438093989:web:45311a4b2cbe6f6f4b714c",
-            databaseURL: "https://mx-e-sports-82b3d-default-rtdb.firebaseio.com",
-            projectId: "mx-e-sports-82b3d"
+            apiKey: "YOUR_API_KEY",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        function checkPin() {
+            const pin = document.getElementById('adminPin').value;
+            if(pin === "1234") { // आप इस 1234 को बदलकर अपना पासवर्ड बना सकते हैं
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('mainDashboard').classList.remove('hidden');
+            } else {
+                alert("गलत पिन!");
+            }
+        }
 
         function createMatch() {
             const title = document.getElementById('title').value;
             const time = document.getElementById('time').value;
             const fee = document.getElementById('fee').value;
             const prize = document.getElementById('prize').value;
-            const slots = document.getElementById('slots').value;
+            const slots = document.getElementById('slots').value || 48;
 
-            if(!title || !time || !fee || !prize) return alert('सभी जानकारी भरें!');
+            if(!title || !time || !fee || !prize) return alert('सभी डिटेल्स भरें!');
 
             const matchRef = db.ref('matches').push();
             matchRef.set({
                 id: matchRef.key,
                 title, time, fee, prize, slots,
-                joined: 0,
-                roomId: "",
-                roomPass: ""
+                roomId: "", roomPass: "",
+                status: "upcoming",
+                winner: ""
             }).then(() => {
-                alert('मैच सफलतापूर्वक बन गया!');
-                location.reload();
+                alert('मैच लाइव हो गया!');
+                document.getElementById('title').value = '';
             });
         }
 
+        // Load Matches
         db.ref('matches').on('value', snapshot => {
             const container = document.getElementById('matchesList');
             container.innerHTML = '';
             const data = snapshot.val();
-            if(!data) return container.innerHTML = '<p class="text-gray-500">कोई मैच नहीं है।</p>';
+            if(!data) return container.innerHTML = '<p class="text-gray-500 text-sm">कोई मैच नहीं है।</p>';
 
             for(let id in data) {
                 const m = data[id];
-                container.innerHTML += `
-                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div>
-                            <h3 class="font-bold text-lg text-yellow-400">${m.title}</h3>
-                            <p class="text-sm text-gray-400">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize}</p>
-                            <p class="text-xs text-green-400">रूम आईडी: ${m.roomId || 'अभी नहीं दी गई'} | पासवर्ड: ${m.roomPass || 'N/A'}</p>
+                db.ref('participants/' + id).once('value', pSnap => {
+                    const joinedCount = pSnap.numChildren();
+                    container.innerHTML += `
+                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-bold text-yellow-400 text-base">${m.title}</h3>
+                                    <p class="text-xs text-gray-400">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize}</p>
+                                    <p class="text-xs text-blue-400 font-semibold mt-1">स्लॉट्स: ${joinedCount}/${m.slots} जॉइंड | स्टेटस: ${m.status}</p>
+                                    ${m.winner ? `<p class="text-xs text-green-400 font-bold mt-1">🏆 Winner: ${m.winner}</p>` : ''}
+                                </div>
+                                <button onclick="deleteMatch('${id}')" class="text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40">डिलीट</button>
+                            </div>
+
+                            <!-- Room ID Update -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 my-3">
+                                <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
+                                <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
+                                <button onclick="updateRoom('${id}')" class="bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold">ID/Pass भेजें</button>
+                                <button onclick="viewPlayers('${id}')" class="bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold">खिलाड़ी देखें (${joinedCount})</button>
+                            </div>
+
+                            <!-- Declare Winner Section -->
+                            <div class="flex gap-2 items-center pt-2 border-t border-gray-800">
+                                <input id="win_${id}" type="text" placeholder="विनर का IGN / UID" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700">
+                                <button onclick="setWinner('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black text-xs px-3 py-1.5 rounded font-bold">विनर घोषित करें</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 w-full md:w-auto">
-                            <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-sm bg-gray-700 rounded w-24">
-                            <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-sm bg-gray-700 rounded w-20">
-                            <button onclick="updateRoom('${id}')" class="bg-green-600 px-3 py-1.5 rounded text-sm font-semibold hover:bg-green-700">अपडेट</button>
-                            <button onclick="deleteMatch('${id}')" class="bg-red-600 px-3 py-1.5 rounded text-sm font-semibold hover:bg-red-700">हटाएँ</button>
-                        </div>
-                    </div>
-                `;
+                    `;
+                });
             }
         });
 
@@ -94,14 +149,80 @@
             const roomId = document.getElementById('rid_' + id).value;
             const roomPass = document.getElementById('rpass_' + id).value;
             db.ref('matches/' + id).update({ roomId, roomPass })
-                .then(() => alert('Room ID और पासवर्ड अपडेट हो गया!'));
+                .then(() => alert('Room ID और Pass अपडेट हो गया!'));
+        }
+
+        function setWinner(id) {
+            const winner = document.getElementById('win_' + id).value;
+            if(!winner) return alert('विनर का नाम लिखें!');
+            db.ref('matches/' + id).update({ winner, status: "completed" })
+                .then(() => alert('विनर घोषित हो गया!'));
         }
 
         function deleteMatch(id) {
-            if(confirm('क्या आप सच में यह मैच हटाना चाहते हैं?')) {
+            if(confirm('क्या सच में यह मैच हटाना है?')) {
                 db.ref('matches/' + id).remove();
+                db.ref('participants/' + id).remove();
             }
+        }
+
+        function viewPlayers(id) {
+            db.ref('participants/' + id).once('value', snap => {
+                const list = document.getElementById('playersListContent');
+                list.innerHTML = '';
+                const data = snap.val();
+                if(!data) {
+                    list.innerHTML = '<p class="text-gray-400 py-4 text-center">अभी तक किसी ने जॉइन नहीं किया।</p>';
+                } else {
+                    let i = 1;
+                    for(let key in data) {
+                        list.innerHTML += `
+                            <div class="py-2 flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-white">${i++}. ${data[key].name}</p>
+                                    <p class="text-xs text-yellow-400">UID: ${data[key].uid}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                document.getElementById('playersModal').classList.remove('hidden');
+                document.getElementById('playersModal').classList.add('flex');
+            });
+        }
+
+        function closePlayersModal() {
+            document.getElementById('playersModal').classList.add('hidden');
+            document.getElementById('playersModal').classList.remove('flex');
+        }
+
+        // Load Deposits
+        db.ref('deposits').on('value', snap => {
+            const box = document.getElementById('depositRequests');
+            box.innerHTML = '';
+            const data = snap.val();
+            if(!data) return box.innerHTML = '<p class="text-gray-500 text-xs">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>';
+
+            for(let id in data) {
+                const req = data[id];
+                if(req.status === 'pending') {
+                    box.innerHTML += `
+                        <div class="bg-gray-800 p-2.5 rounded flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-yellow-400">₹${req.amount} | UTR: ${req.utr}</p>
+                                <p class="text-xs text-gray-400">User: ${req.userName} (UID: ${req.uid})</p>
+                            </div>
+                            <button onclick="approveDeposit('${id}')" class="bg-green-600 px-3 py-1 rounded text-xs font-bold">Approve</button>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        function approveDeposit(id) {
+            db.ref('deposits/' + id).update({ status: 'approved' })
+                .then(() => alert('पेमेंट अप्रूव हो गया!'));
         }
     </script>
 </body>
-</html>
+                    </html>
