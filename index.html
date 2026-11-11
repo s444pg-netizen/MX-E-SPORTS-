@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MX E-SPORTS | Grind Battle Edition</title>
+    <title>MX E-SPORTS | Official FF Arena</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -19,39 +19,39 @@
         }
     </style>
 </head>
-<body class="bg-[#0b0e14] text-gray-100 min-h-screen pb-24 font-sans select-none">
+<body class="bg-gray-950 text-white min-h-screen pb-24 font-sans select-none">
 
     <!-- ========================================== -->
     <!-- 1. LOGIN / SIGNUP SCREEN                   -->
     <!-- ========================================== -->
-    <div id="authScreen" class="fixed inset-0 bg-[#07090e]/95 flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-[#121722] border border-orange-500/30 p-6 rounded-3xl w-full max-w-xs shadow-2xl space-y-4 my-auto">
+    <div id="authScreen" class="fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-gray-900 border border-yellow-500/30 p-6 rounded-3xl w-full max-w-xs shadow-2xl space-y-4 my-auto">
             <div class="text-center space-y-1">
-                <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-orange-600 to-yellow-500 flex items-center justify-center text-xl font-black shadow-lg">🔥</div>
-                <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400 tracking-wider">GRIND BATTLE</h1>
-                <p class="text-[11px] text-gray-400 font-semibold tracking-wide">MX E-SPORTS TOURNAMENT</p>
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center text-xl font-black text-black shadow-lg">MX</div>
+                <h1 class="text-2xl font-black text-yellow-500 tracking-wider">MX E-SPORTS</h1>
+                <p class="text-[11px] text-gray-400">ऑफिशियल गेमिंग प्लेटफॉर्म</p>
             </div>
 
-            <div class="flex bg-[#0b0e14] p-1 rounded-xl text-xs font-bold text-center border border-gray-800">
-                <button onclick="switchAuthTab('login')" id="authTabLogin" class="flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow">लॉगिन</button>
-                <button onclick="switchAuthTab('signup')" id="authTabSignup" class="flex-1 py-1.5 rounded-lg text-gray-400">रजिस्टर</button>
+            <div class="flex bg-gray-800 p-1 rounded-xl text-xs font-bold text-center border border-gray-700">
+                <button onclick="switchAuthTab('login')" id="authTabLogin" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black shadow font-bold">लॉगिन</button>
+                <button onclick="switchAuthTab('signup')" id="authTabSignup" class="flex-1 py-1.5 rounded-lg text-gray-400 font-bold">साइन अप</button>
             </div>
 
             <!-- Login -->
             <div id="loginForm" class="space-y-3">
-                <input id="loginUid" type="text" placeholder="Free Fire UID" class="w-full p-2.5 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white focus:outline-none focus:border-orange-500">
-                <input id="loginPass" type="password" placeholder="पासवर्ड" class="w-full p-2.5 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white focus:outline-none focus:border-orange-500">
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">लॉगिन करें</button>
+                <input id="loginUid" type="text" placeholder="Free Fire UID" class="w-full p-2.5 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500">
+                <input id="loginPass" type="password" placeholder="पासवर्ड" class="w-full p-2.5 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500">
+                <button onclick="handleLogin()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">लॉगिन करें</button>
             </div>
 
             <!-- Signup -->
             <div id="signupForm" class="space-y-2.5 hidden">
-                <input id="regName" type="text" placeholder="Free Fire IGN (गेम नाम)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                <input id="regUid" type="text" placeholder="Free Fire UID (नंबर)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                <input id="regPhone" type="tel" placeholder="WhatsApp नंबर" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                <input id="regPass" type="password" placeholder="पासवर्ड" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                <input id="regRef" type="text" placeholder="रेफरल कोड (वैकल्पिक)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-dashed border-orange-500/50 text-xs text-orange-400 placeholder-gray-600">
-                <button onclick="handleSignup()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white font-black py-2.5 rounded-xl text-xs shadow-lg transition">अकाउंट बनाएँ</button>
+                <input id="regName" type="text" placeholder="Free Fire IGN (गेम नाम)" class="w-full p-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regUid" type="text" placeholder="Free Fire UID (नंबर)" class="w-full p-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regPhone" type="tel" placeholder="WhatsApp नंबर" class="w-full p-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regPass" type="password" placeholder="पासवर्ड बनाएँ" class="w-full p-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="regRef" type="text" placeholder="रेफरल कोड (वैकल्पिक)" class="w-full p-2 rounded-xl bg-gray-800 border border-dashed border-yellow-500/50 text-xs text-yellow-400 placeholder-gray-500">
+                <button onclick="handleSignup()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-2.5 rounded-xl text-xs shadow-lg transition">अकाउंट बनाएँ</button>
             </div>
         </div>
     </div>
@@ -60,41 +60,83 @@
     <!-- 2. MAIN APP CONTENT                        -->
     <!-- ========================================== -->
     <div id="appContent" class="hidden">
-        <!-- Top Grind Battle Header -->
-        <header class="bg-[#10141d]/90 backdrop-blur-md border-b border-gray-800/80 p-3 sticky top-0 z-40 shadow-xl">
+        <!-- Top Header -->
+        <header class="bg-gray-900 border-b border-gray-800 p-3 sticky top-0 z-40 shadow-xl">
             <div class="max-w-md mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-yellow-400 flex items-center justify-center font-black text-black text-xs shadow">GB</div>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center font-black text-black text-xs shadow">MX</div>
                     <div>
-                        <h1 class="text-sm font-black text-white tracking-wide leading-none">GRIND BATTLE</h1>
-                        <p id="headerIgn" class="text-[10px] text-gray-400 font-medium">खिलाड़ी लोड हो रहा है...</p>
+                        <h1 class="text-sm font-black text-yellow-500 tracking-wider leading-none">MX E-SPORTS</h1>
+                        <p id="headerIgn" class="text-[10px] text-gray-400">लोड हो रहा है...</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="openWalletModal()" class="flex items-center gap-1.5 bg-[#171d2b] border border-orange-500/40 px-3 py-1.5 rounded-xl text-xs font-black shadow-inner">
+                    <button onclick="openWalletModal()" class="flex items-center gap-1.5 bg-gray-800 border border-yellow-500/40 px-3 py-1.5 rounded-xl text-xs font-black shadow-inner">
                         <span class="text-yellow-400 font-mono" id="displayBalance">₹0</span>
-                        <span class="bg-orange-500 text-black text-[10px] px-1.5 py-0.2 rounded-md font-black">+</span>
+                        <span class="bg-yellow-500 text-black text-[10px] px-1.5 py-0.2 rounded-md font-black">+</span>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Scrolling Ticker Notice (Grind Battle Style) -->
-        <div class="bg-gradient-to-r from-orange-600/20 via-yellow-500/20 to-orange-600/20 border-b border-orange-500/20 py-1 overflow-hidden text-[11px] text-orange-300 font-bold">
-            <div class="animate-marquee">
-                📢 स्वागत है Grind Battle ई-स्पोर्ट्स में! • फेयर प्ले खेलें • रूम आईडी और पासवर्ड मैच से 15 मिनट पहले आएगा • जीते हुए पैसे तुरंत UPI पर विड्रॉल करें!
+        <!-- Live Notice Ticker from Admin -->
+        <div id="noticeBarContainer" class="bg-gradient-to-r from-yellow-600/20 via-orange-500/20 to-yellow-600/20 border-b border-yellow-500/20 py-1 overflow-hidden text-[11px] text-yellow-300 font-bold">
+            <div class="animate-marquee" id="liveNoticeText">
+                📢 स्वागत है MX E-SPORTS में! फेयर प्ले खेलें, रूम आईडी मैच से 15 मिनट पहले आएगी।
             </div>
         </div>
 
+        <!-- Live Video / Stream Banner (Shows only if Admin adds link) -->
+        <div id="videoLinkBanner" class="max-w-md mx-auto px-3.5 pt-2 hidden">
+            <a id="streamLinkBtn" href="#" target="_blank" class="block bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-black p-2.5 rounded-2xl shadow-lg flex items-center justify-between transition">
+                <span class="flex items-center gap-2">🎥 लाइव मैच / वीडियो स्ट्रीम देखें</span>
+                <span class="bg-white/20 px-2 py-0.5 rounded-full text-[10px]">WATCH NOW ➔</span>
+            </a>
+        </div>
+
         <!-- ========================================== -->
-        <!-- TAB 1: PLAY / MATCHES                      -->
+        <!-- TAB 1: TOURNAMENTS WITH 6 GAME MODES       -->
         <!-- ========================================== -->
         <section id="viewMatches" class="max-w-md mx-auto p-3.5 space-y-3.5">
-            <!-- Category Pills -->
-            <div class="flex gap-2 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
-                <button onclick="filterCategory('all')" id="pillAll" class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow font-black whitespace-nowrap">🔥 ऑल टूर्नामेंट्स</button>
-                <button onclick="filterCategory('solo')" id="pillSolo" class="px-3.5 py-1.5 rounded-full bg-[#151a26] text-gray-400 hover:text-white border border-gray-800 whitespace-nowrap">👤 Solo</button>
-                <button onclick="filterCategory('duo')" id="pillDuo" class="px-3.5 py-1.5 rounded-full bg-[#151a26] text-gray-400 hover:text-white border border-gray-800 whitespace-nowrap">👥 Duo</button>
+            
+            <!-- 6 GAME MODE BUTTONS IN 2x3 GRID -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between items-center text-xs font-bold text-gray-400 px-1">
+                    <span>🎮 गेम मोड चुनें:</span>
+                    <button onclick="filterMode('ALL')" class="text-yellow-400 hover:underline text-[11px]">सभी दिखाएँ (ALL)</button>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-black">
+                    <button onclick="filterMode('CLASH SQUAD 1VS1')" id="btnCS1" class="mode-btn p-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/60 flex items-center gap-2 transition text-left">
+                        <span class="text-base">⚔️</span>
+                        <span class="text-[10px] leading-tight text-white">CLASH SQUAD<br><b class="text-yellow-400">1 VS 1</b></span>
+                    </button>
+                    <button onclick="filterMode('CLASH SQUAD 2VS2')" id="btnCS2" class="mode-btn p-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/60 flex items-center gap-2 transition text-left">
+                        <span class="text-base">👥</span>
+                        <span class="text-[10px] leading-tight text-white">CLASH SQUAD<br><b class="text-yellow-400">2 VS 2</b></span>
+                    </button>
+                    <button onclick="filterMode('SURVIVOR')" id="btnSurv" class="mode-btn p-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/60 flex items-center gap-2 transition text-left">
+                        <span class="text-base">💀</span>
+                        <span class="text-[10px] leading-tight text-white">SURVIVOR<br><b class="text-orange-400">BATTLE</b></span>
+                    </button>
+                    <button onclick="filterMode('BERMUDA')" id="btnBerm" class="mode-btn p-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/60 flex items-center gap-2 transition text-left">
+                        <span class="text-base">🏝️</span>
+                        <span class="text-[10px] leading-tight text-white">BERMUDA<br><b class="text-green-400">CLASSIC</b></span>
+                    </button>
+                    <button onclick="filterMode('LONE WOLF')" id="btnLone" class="mode-btn p-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/60 flex items-center gap-2 transition text-left">
+                        <span class="text-base">🐺</span>
+                        <span class="text-[10px] leading-tight text-white">LONE WOLF<br><b class="text-purple-400">ARENA</b></span>
+                    </button>
+                    <button onclick="filterMode('FREE MATCH')" id="btnFree" class="mode-btn p-2.5 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/60 flex items-center gap-2 transition text-left">
+                        <span class="text-base">🎁</span>
+                        <span class="text-[10px] leading-tight text-white">FREE MATCH<br><b class="text-emerald-400">₹0 ENTRY</b></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Filter Badge -->
+            <div class="flex items-center justify-between bg-gray-900/60 px-3 py-1.5 rounded-xl border border-gray-800 text-xs">
+                <span class="text-gray-400 text-[11px]">सिलेक्टेड मोड: <b id="activeModeBadge" class="text-yellow-400">सभी टूर्नामेंट्स</b></span>
             </div>
 
             <!-- Matches List -->
@@ -107,9 +149,9 @@
         <!-- TAB 2: MY MATCHES                          -->
         <!-- ========================================== -->
         <section id="viewMyMatches" class="max-w-md mx-auto p-3.5 space-y-3 hidden">
-            <div class="bg-[#121722] p-3 rounded-2xl border border-gray-800 flex justify-between items-center">
+            <div class="bg-gray-900 p-3 rounded-2xl border border-gray-800 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xs font-bold text-orange-400">🎮 मेरे जॉइन किए गए मैचेस</h2>
+                    <h2 class="text-xs font-bold text-yellow-400">🎮 मेरे जॉइन किए गए मैचेस</h2>
                     <p class="text-[10px] text-gray-400">यहाँ आपको रूम आईडी और पासवर्ड मिलेगा</p>
                 </div>
             </div>
@@ -122,8 +164,8 @@
         <!-- TAB 3: LEADERBOARD                         -->
         <!-- ========================================== -->
         <section id="viewLeaderboard" class="max-w-md mx-auto p-3.5 space-y-3 hidden">
-            <div class="bg-gradient-to-r from-orange-600/20 to-yellow-500/20 p-4 rounded-2xl border border-orange-500/30 text-center space-y-1">
-                <h2 class="text-base font-black text-yellow-400">🏆 GRIND BATTLE LEADERBOARD</h2>
+            <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 p-4 rounded-2xl border border-yellow-500/30 text-center space-y-1">
+                <h2 class="text-base font-black text-yellow-400">🏆 MX E-SPORTS LEADERBOARD</h2>
                 <p class="text-[11px] text-gray-300">टॉप अर्नर और सबसे बड़े विजेता खिलाड़ी</p>
             </div>
             <div id="leaderboardList" class="space-y-2">
@@ -136,56 +178,55 @@
         <!-- ========================================== -->
         <section id="viewProfile" class="max-w-md mx-auto p-3.5 space-y-3.5 hidden">
             <!-- Profile Card -->
-            <div class="bg-[#121722] p-4 rounded-2xl border border-gray-800 space-y-3 shadow-xl">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-3 shadow-xl">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-yellow-500 flex items-center justify-center text-xl font-black text-black">👤</div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center text-xl font-black text-black">👤</div>
                     <div>
                         <h2 id="profName" class="text-sm font-black text-white">Player</h2>
-                        <p class="text-[11px] text-gray-400 font-mono">UID: <span id="profUid" class="text-orange-400 font-bold"></span></p>
+                        <p class="text-[11px] text-gray-400 font-mono">UID: <span id="profUid" class="text-yellow-400 font-bold"></span></p>
                         <p class="text-[10px] text-gray-500">Phone: <span id="profPhone" class="text-gray-300"></span></p>
                     </div>
                 </div>
 
-                <!-- Stats summary -->
-                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-800/80 text-center">
-                    <div class="bg-[#0b0e14] p-2.5 rounded-xl border border-gray-800">
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-800 text-center">
+                    <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800">
                         <p class="text-[10px] text-gray-400">वॉलेट बैलेंस</p>
                         <p id="profBalance" class="text-sm font-black text-green-400 font-mono">₹0</p>
                     </div>
-                    <div class="bg-[#0b0e14] p-2.5 rounded-xl border border-gray-800">
+                    <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800">
                         <p class="text-[10px] text-gray-400">रेफरल कोड</p>
                         <p id="profRefCode" class="text-xs font-black text-yellow-400 font-mono select-all"></p>
                     </div>
                 </div>
 
                 <button onclick="shareReferral()" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:opacity-90 text-white font-black py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow">
-                    <span>🎁 रेफर करें & ₹5 कॉइन कमाएँ</span>
+                    <span>🎁 दोस्तों को रेफर करें & ₹5 कमाएँ</span>
                 </button>
             </div>
 
-            <!-- Support & Community Links -->
-            <div class="bg-[#121722] p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
-                <a href="https://whatsapp.com/channel/YAHAN_APNA_LINK_DALEIN" target="_blank" class="flex items-center justify-between p-2.5 rounded-xl bg-[#0b0e14] hover:bg-gray-800/50 border border-gray-800 text-green-400 font-bold transition">
+            <!-- WhatsApp Support & Rules -->
+            <div class="bg-gray-900 p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
+                <a href="https://whatsapp.com/channel/YAHAN_APNA_LINK_DALEIN" target="_blank" class="flex items-center justify-between p-2.5 rounded-xl bg-gray-950 hover:bg-gray-800 border border-gray-800 text-green-400 font-bold transition">
                     <span class="flex items-center gap-2">📢 ऑफिशियल WhatsApp चैनल</span>
                     <span>➔</span>
                 </a>
-                <button onclick="alert('नियम:\n1. हैकर्स को तुरंत बैन किया जाएगा।\n2. रूम में 15 मिनट पहले आएँ।\n3. रूम पासवर्ड किसी को शेयर न करें।')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-[#0b0e14] hover:bg-gray-800/50 border border-gray-800 text-gray-300 font-bold transition">
+                <button onclick="alert('नियम:\n1. कोई हैकर अलाउड नहीं है।\n2. 15 मिनट पहले रूम में आएँ।\n3. गलत रिजल्ट देने पर अकाउंट ब्लॉक होगा।')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-950 hover:bg-gray-800 border border-gray-800 text-gray-300 font-bold transition">
                     <span class="flex items-center gap-2">📜 टूर्नामेंट फेयर प्ले नियम</span>
                     <span>➔</span>
                 </button>
-                <button onclick="handleLogout()" class="w-full p-2.5 rounded-xl bg-red-950/40 hover:bg-red-950/70 border border-red-800/50 text-red-400 font-bold transition text-center">
+                <button onclick="handleLogout()" class="w-full p-2.5 rounded-xl bg-red-950/40 hover:bg-red-900 border border-red-800/50 text-red-400 font-bold transition text-center">
                     लॉगआउट (Logout)
                 </button>
             </div>
         </section>
 
         <!-- ========================================== -->
-        <!-- BOTTOM NAVIGATION (GRIND BATTLE STYLE)     -->
+        <!-- BOTTOM NAVIGATION (4 MENUS)                -->
         <!-- ========================================== -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-[#0e121a]/95 backdrop-blur-md border-t border-gray-800 flex justify-around items-center py-2.5 px-2 z-40 max-w-md mx-auto">
-            <button onclick="navSwitch('matches')" id="navMatches" class="flex flex-col items-center text-orange-500 transition">
+        <nav class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-800 flex justify-around items-center py-2.5 px-2 z-40 max-w-md mx-auto">
+            <button onclick="navSwitch('matches')" id="navMatches" class="flex flex-col items-center text-yellow-500 transition">
                 <span class="text-base">🎮</span>
-                <span class="text-[9px] font-black uppercase tracking-wider mt-0.5">Play</span>
+                <span class="text-[9px] font-black uppercase tracking-wider mt-0.5">टूर्नामेंट्स</span>
             </button>
             <button onclick="navSwitch('myMatches')" id="navMyMatches" class="flex flex-col items-center text-gray-500 transition">
                 <span class="text-base">📜</span>
@@ -193,11 +234,11 @@
             </button>
             <button onclick="navSwitch('leaderboard')" id="navLeaderboard" class="flex flex-col items-center text-gray-500 transition">
                 <span class="text-base">🏆</span>
-                <span class="text-[9px] font-black uppercase tracking-wider mt-0.5">Ranks</span>
+                <span class="text-[9px] font-black uppercase tracking-wider mt-0.5">लीडरबोर्ड</span>
             </button>
             <button onclick="navSwitch('profile')" id="navProfile" class="flex flex-col items-center text-gray-500 transition">
                 <span class="text-base">👤</span>
-                <span class="text-[9px] font-black uppercase tracking-wider mt-0.5">Profile</span>
+                <span class="text-[9px] font-black uppercase tracking-wider mt-0.5">प्रोफाइल</span>
             </button>
         </nav>
     </div>
@@ -206,29 +247,29 @@
     <!-- MODAL: JOIN TOURNAMENT                     -->
     <!-- ========================================== -->
     <div id="joinModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-[#121722] border border-orange-500/40 p-5 rounded-3xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
+        <div class="bg-gray-900 border border-yellow-500/40 p-5 rounded-3xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                <h3 class="font-black text-orange-400 text-sm">मैच जॉइन कन्फर्मेशन</h3>
+                <h3 class="font-black text-yellow-400 text-sm">मैच जॉइन कन्फर्मेशन</h3>
                 <button onclick="closeModal('joinModal')" class="text-gray-400 font-bold">&times;</button>
             </div>
             
-            <p id="joinFeeWarning" class="text-xs text-yellow-400 font-bold bg-[#0b0e14] p-2 rounded-xl text-center border border-gray-800"></p>
+            <p id="joinFeeWarning" class="text-xs text-yellow-400 font-bold bg-gray-950 p-2 rounded-xl text-center border border-gray-800"></p>
 
             <div class="space-y-1.5">
                 <p class="text-[10px] text-gray-400">प्लेयर 1 (IGN & UID):</p>
-                <input id="joinP1Name" type="text" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white" readonly>
-                <input id="joinP1Uid" type="text" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-yellow-400 font-mono" readonly>
+                <input id="joinP1Name" type="text" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white" readonly>
+                <input id="joinP1Uid" type="text" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-yellow-400 font-mono" readonly>
             </div>
 
             <!-- Duo Fields -->
             <div id="duoFields" class="space-y-1.5 pt-1 border-t border-gray-800 hidden">
-                <p class="text-[10px] text-purple-400 font-bold">टीममेट 2 (Duo Partner):</p>
-                <input id="joinP2Name" type="text" placeholder="प्लेयर 2 का गेम नाम (IGN)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                <input id="joinP2Uid" type="text" placeholder="प्लेयर 2 की Free Fire UID" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
+                <p class="text-[10px] text-purple-400 font-bold">टीममेट 2 (Partner):</p>
+                <input id="joinP2Name" type="text" placeholder="प्लेयर 2 का गेम नाम (IGN)" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white">
+                <input id="joinP2Uid" type="text" placeholder="प्लेयर 2 की Free Fire UID" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white">
             </div>
 
             <div class="pt-2">
-                <button onclick="processMatchJoin()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">
+                <button onclick="processMatchJoin()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">
                     कन्फर्म जॉइन (Coin Pay)
                 </button>
             </div>
@@ -236,13 +277,13 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL: PLAYERS LIST                        -->
+    <!-- MODAL: PLAYERS LIST (ALL PLAYERS CAN SEE)  -->
     <!-- ========================================== -->
     <div id="viewPlayersModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#121722] border border-gray-800 p-5 rounded-3xl w-full max-w-xs max-h-[75vh] flex flex-col shadow-2xl">
-            <h3 class="font-black text-orange-400 text-sm mb-2">👥 इस मैच के खिलाड़ी</h3>
-            <div id="joinedPlayersContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800/60 pr-1"></div>
-            <button onclick="closeModal('viewPlayersModal')" class="mt-3 bg-[#1a2130] text-gray-200 font-bold py-2 rounded-xl text-xs">बंद करें</button>
+        <div class="bg-gray-900 border border-gray-800 p-5 rounded-3xl w-full max-w-xs max-h-[75vh] flex flex-col shadow-2xl">
+            <h3 class="font-black text-yellow-400 text-sm mb-2">👥 इस मैच में जॉइन हुए सभी खिलाड़ी</h3>
+            <div id="joinedPlayersContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800/80 pr-1"></div>
+            <button onclick="closeModal('viewPlayersModal')" class="mt-3 bg-gray-800 text-gray-200 font-bold py-2 rounded-xl text-xs">बंद करें</button>
         </div>
     </div>
 
@@ -250,50 +291,50 @@
     <!-- MODAL: WALLET (ADD & WITHDRAW)             -->
     <!-- ========================================== -->
     <div id="walletModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-[#121722] border border-orange-500/30 p-5 rounded-3xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
+        <div class="bg-gray-900 border border-yellow-500/30 p-5 rounded-3xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                 <div>
-                    <h3 class="font-black text-orange-400 text-sm">💰 GRIND BATTLE WALLET</h3>
+                    <h3 class="font-black text-yellow-400 text-sm">💰 MX E-SPORTS WALLET</h3>
                     <p class="text-[10px] text-gray-400">बैलेंस: <span id="modalBalance" class="text-green-400 font-mono font-bold">₹0</span></p>
                 </div>
                 <button onclick="closeModal('walletModal')" class="text-gray-400 font-bold">&times;</button>
             </div>
 
             <!-- Sub Tabs -->
-            <div class="flex bg-[#0b0e14] p-1 rounded-xl text-xs font-bold text-center border border-gray-800">
-                <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-yellow-500 text-black">➕ Add Coins</button>
+            <div class="flex bg-gray-950 p-1 rounded-xl text-xs font-bold text-center border border-gray-800">
+                <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">➕ Add Coins</button>
                 <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400">💸 Withdraw</button>
             </div>
 
             <!-- Deposit Section -->
             <div id="depositSection" class="space-y-3">
-                <div class="bg-[#0b0e14] p-3 rounded-2xl text-center space-y-2 border border-gray-800">
+                <div class="bg-gray-950 p-3 rounded-2xl text-center space-y-2 border border-gray-800">
                     <p class="text-[11px] text-gray-300 font-bold">QR कोड स्कैन करके कॉइन जोड़ें:</p>
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D7985589166%40fam%26pn%3DMX_ESPORTS%26cu%3DINR" 
-                         alt="UPI QR" class="w-36 h-36 rounded-xl border-2 border-orange-500/50 p-1 bg-white shadow mx-auto">
-                    <div class="bg-[#171d2b] p-1.5 rounded-xl border border-gray-700">
+                         alt="UPI QR" class="w-36 h-36 rounded-xl border-2 border-yellow-500/50 p-1 bg-white shadow mx-auto">
+                    <div class="bg-gray-900 p-1.5 rounded-xl border border-gray-800">
                         <p class="font-mono text-xs text-yellow-400 font-bold select-all">7985589166@fam</p>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <input id="depositAmount" type="number" placeholder="पेमेंट अमाउंट (₹)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                    <input id="depositUtr" type="text" placeholder="12-अंकों का UTR / Ref No." class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                    <button onclick="submitDeposit()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 text-white font-black py-2 rounded-xl text-xs shadow transition">पेमेंट सबमिट करें</button>
+                    <input id="depositAmount" type="number" placeholder="पेमेंट अमाउंट (₹)" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white">
+                    <input id="depositUtr" type="text" placeholder="12-अंकों का UTR / Ref No." class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white">
+                    <button onclick="submitDeposit()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-2 rounded-xl text-xs shadow transition">पेमेंट सबमिट करें</button>
                 </div>
             </div>
 
             <!-- Withdraw Section -->
             <div id="withdrawSection" class="space-y-3 hidden">
-                <div class="bg-[#0b0e14] p-2.5 rounded-xl border border-gray-800 text-[10px] text-gray-400 space-y-1">
+                <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] text-gray-400 space-y-1">
                     <p class="text-yellow-400 font-bold">⚠️ विड्रॉल नियम:</p>
                     <p>• आप केवल अपने बैलेंस जितना निकाल सकते हैं।</p>
                     <p>• 2 घंटे में पैसे आपके बैंक/UPI में आ जाएँगे।</p>
                 </div>
                 <div class="space-y-2">
-                    <input id="wthAmount" type="number" placeholder="विड्रॉल अमाउंट (₹)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white">
-                    <input id="wthUpi" type="text" placeholder="अपनी UPI ID (Google Pay / PhonePe)" class="w-full p-2 rounded-xl bg-[#0b0e14] border border-gray-800 text-xs text-white font-mono">
-                    <button onclick="submitWithdraw()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-black font-black py-2 rounded-xl text-xs shadow transition">विड्रॉल रिक्वेस्ट भेजें</button>
+                    <input id="wthAmount" type="number" placeholder="विड्रॉल अमाउंट (₹)" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white">
+                    <input id="wthUpi" type="text" placeholder="अपनी UPI ID (Google Pay / PhonePe)" class="w-full p-2 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white font-mono">
+                    <button onclick="submitWithdraw()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2 rounded-xl text-xs shadow transition">विड्रॉल रिक्वेस्ट भेजें</button>
                 </div>
             </div>
         </div>
@@ -315,7 +356,7 @@
         let currentUser = null;
         let myCurrentBalance = 0;
         let activeMatch = null;
-        let currentCategory = 'all';
+        let selectedModeFilter = 'ALL';
 
         window.onload = function() {
             const savedUid = localStorage.getItem('mx_auth_uid');
@@ -324,18 +365,40 @@
             } else {
                 document.getElementById('authScreen').classList.remove('hidden');
             }
+            listenNoticeAndVideo();
         };
+
+        // Listen for Realtime Notice & Video Link from Admin
+        function listenNoticeAndVideo() {
+            db.ref('notice').on('value', snap => {
+                const text = snap.val();
+                if(text) {
+                    document.getElementById('liveNoticeText').innerText = '📢 ' + text;
+                }
+            });
+
+            db.ref('videoLink').on('value', snap => {
+                const link = snap.val();
+                const banner = document.getElementById('videoLinkBanner');
+                if(link && link.trim() !== '') {
+                    document.getElementById('streamLinkBtn').href = link;
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+            });
+        }
 
         function switchAuthTab(type) {
             if(type === 'login') {
                 document.getElementById('loginForm').classList.remove('hidden');
                 document.getElementById('signupForm').classList.add('hidden');
-                document.getElementById('authTabLogin').className = "flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-bold";
+                document.getElementById('authTabLogin').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
                 document.getElementById('authTabSignup').className = "flex-1 py-1.5 rounded-lg text-gray-400 font-bold";
             } else {
                 document.getElementById('loginForm').classList.add('hidden');
                 document.getElementById('signupForm').classList.remove('hidden');
-                document.getElementById('authTabSignup').className = "flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-bold";
+                document.getElementById('authTabSignup').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
                 document.getElementById('authTabLogin').className = "flex-1 py-1.5 rounded-lg text-gray-400 font-bold";
             }
         }
@@ -364,7 +427,7 @@
                 }
 
                 db.ref('users/' + uid).set(userData).then(() => {
-                    alert('🎉 Grind Battle में स्वागत है!');
+                    alert('🎉 MX E-SPORTS में स्वागत है!');
                     localStorage.setItem('mx_auth_uid', uid);
                     loadUserData(uid);
                 });
@@ -397,7 +460,6 @@
                 document.getElementById('displayBalance').innerText = '₹' + myCurrentBalance;
                 document.getElementById('modalBalance').innerText = '₹' + myCurrentBalance;
 
-                // Profile tab
                 document.getElementById('profName').innerText = currentUser.name;
                 document.getElementById('profUid').innerText = currentUser.uid;
                 document.getElementById('profPhone').innerText = currentUser.phone || 'N/A';
@@ -416,36 +478,41 @@
 
             if(view === 'matches') {
                 document.getElementById('viewMatches').classList.remove('hidden');
-                document.getElementById('navMatches').className = "flex flex-col items-center text-orange-500 transition";
+                document.getElementById('navMatches').className = "flex flex-col items-center text-yellow-500 transition";
             } else if(view === 'myMatches') {
                 document.getElementById('viewMyMatches').classList.remove('hidden');
-                document.getElementById('navMyMatches').className = "flex flex-col items-center text-orange-500 transition";
+                document.getElementById('navMyMatches').className = "flex flex-col items-center text-yellow-500 transition";
             } else if(view === 'leaderboard') {
                 document.getElementById('viewLeaderboard').classList.remove('hidden');
-                document.getElementById('navLeaderboard').className = "flex flex-col items-center text-orange-500 transition";
+                document.getElementById('navLeaderboard').className = "flex flex-col items-center text-yellow-500 transition";
                 loadLeaderboard();
             } else if(view === 'profile') {
                 document.getElementById('viewProfile').classList.remove('hidden');
-                document.getElementById('navProfile').className = "flex flex-col items-center text-orange-500 transition";
+                document.getElementById('navProfile').className = "flex flex-col items-center text-yellow-500 transition";
             }
         }
 
-        function filterCategory(cat) {
-            currentCategory = cat;
-            ['pillAll', 'pillSolo', 'pillDuo'].forEach(id => {
-                document.getElementById(id).className = "px-3.5 py-1.5 rounded-full bg-[#151a26] text-gray-400 hover:text-white border border-gray-800 whitespace-nowrap font-bold";
+        // 6 GAME MODES FILTER
+        function filterMode(mode) {
+            selectedModeFilter = mode;
+            document.getElementById('activeModeBadge').innerText = (mode === 'ALL') ? 'सभी टूर्नामेंट्स' : mode;
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('border-yellow-500', 'bg-gray-800');
+                btn.classList.add('bg-gray-900', 'border-gray-800');
             });
 
-            if(cat === 'all') document.getElementById('pillAll').className = "px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow font-black whitespace-nowrap";
-            if(cat === 'solo') document.getElementById('pillSolo').className = "px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow font-black whitespace-nowrap";
-            if(cat === 'duo') document.getElementById('pillDuo').className = "px-3.5 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow font-black whitespace-nowrap";
+            if(mode === 'CLASH SQUAD 1VS1') document.getElementById('btnCS1').classList.add('border-yellow-500', 'bg-gray-800');
+            if(mode === 'CLASH SQUAD 2VS2') document.getElementById('btnCS2').classList.add('border-yellow-500', 'bg-gray-800');
+            if(mode === 'SURVIVOR') document.getElementById('btnSurv').classList.add('border-yellow-500', 'bg-gray-800');
+            if(mode === 'BERMUDA') document.getElementById('btnBerm').classList.add('border-yellow-500', 'bg-gray-800');
+            if(mode === 'LONE WOLF') document.getElementById('btnLone').classList.add('border-yellow-500', 'bg-gray-800');
+            if(mode === 'FREE MATCH') document.getElementById('btnFree').classList.add('border-yellow-500', 'bg-gray-800');
 
             listenMatches();
         }
 
-        // ==========================================
-        // GRIND BATTLE MATCH CARDS GENERATOR
-        // ==========================================
+        // LOAD MATCHES WITH 6-MODE FILTERING
         function listenMatches() {
             db.ref('matches').on('value', snapshot => {
                 const container = document.getElementById('userMatchesList');
@@ -459,15 +526,16 @@
                     return;
                 }
 
-                let myMatchFound = false;
-
                 for(let id in data) {
                     const m = data[id];
-                    const isDuo = m.title.toLowerCase().includes('duo');
+                    const matchMode = (m.mode || 'BERMUDA').toUpperCase();
 
-                    // Filter check
-                    if(currentCategory === 'solo' && isDuo) continue;
-                    if(currentCategory === 'duo' && !isDuo) continue;
+                    // Apply 6 Mode Filter
+                    if(selectedModeFilter !== 'ALL' && matchMode !== selectedModeFilter) {
+                        continue;
+                    }
+
+                    const isDuo = (matchMode.includes('2VS2') || m.title.toLowerCase().includes('duo'));
 
                     db.ref('participants/' + id).on('value', pSnap => {
                         const joined = pSnap.numChildren();
@@ -479,52 +547,47 @@
                             if(c.p1Uid === currentUser?.uid || c.p2Uid === currentUser?.uid) alreadyJoined = true;
                         });
 
-                        // Grind Battle Card Style
                         const cardHtml = `
-                            <div class="bg-[#121722] border border-gray-800/90 rounded-3xl p-4 shadow-xl space-y-3 relative overflow-hidden">
-                                <!-- Top Bar -->
-                                <div class="flex justify-between items-center border-b border-gray-800/80 pb-2.5">
+                            <div class="bg-gray-900 border border-gray-800 rounded-3xl p-4 shadow-xl space-y-3 relative overflow-hidden">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-2.5">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-black text-white">${m.title}</span>
-                                        <span class="text-[9px] px-2 py-0.5 rounded-md font-black ${isDuo ? 'bg-purple-900/50 text-purple-300 border border-purple-700/50' : 'bg-blue-900/50 text-blue-300 border border-blue-700/50'}">
-                                            ${isDuo ? 'DUO' : 'SOLO'}
+                                        <span class="text-[9px] px-2 py-0.5 rounded-md font-black bg-yellow-500/20 text-yellow-400 border border-yellow-500/40">
+                                            ${matchMode}
                                         </span>
                                     </div>
                                     <span class="text-[10px] text-orange-400 font-bold">⏰ ${m.time}</span>
                                 </div>
 
-                                <!-- Grind Battle 4-Box Stats -->
-                                <div class="grid grid-cols-4 gap-1.5 text-center bg-[#0b0e14] p-2.5 rounded-2xl border border-gray-800">
+                                <div class="grid grid-cols-4 gap-1.5 text-center bg-gray-950 p-2.5 rounded-2xl border border-gray-800">
                                     <div>
                                         <p class="text-[9px] text-gray-400 font-bold uppercase">WIN PRIZE</p>
                                         <p class="text-xs font-black text-yellow-400 font-mono">₹${m.prize}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-[9px] text-gray-400 font-bold uppercase">PER KILL</p>
-                                        <p class="text-xs font-black text-orange-400 font-mono">₹${Math.round(m.fee * 0.7)}</p>
                                     </div>
                                     <div>
                                         <p class="text-[9px] text-gray-400 font-bold uppercase">ENTRY</p>
                                         <p class="text-xs font-black text-green-400 font-mono">₹${m.fee}</p>
                                     </div>
                                     <div>
+                                        <p class="text-[9px] text-gray-400 font-bold uppercase">TYPE</p>
+                                        <p class="text-xs font-black text-blue-400 font-mono">${isDuo ? 'Duo' : 'Solo'}</p>
+                                    </div>
+                                    <div>
                                         <p class="text-[9px] text-gray-400 font-bold uppercase">MAP</p>
-                                        <p class="text-xs font-black text-gray-200">Bermuda</p>
+                                        <p class="text-xs font-black text-gray-200">${m.map || 'Bermuda'}</p>
                                     </div>
                                 </div>
 
-                                <!-- Slots Progress Bar -->
                                 <div class="space-y-1">
                                     <div class="flex justify-between text-[10px] text-gray-400 font-bold">
-                                        <span>Spots: <b class="text-white">${joined}/${m.slots}</b></span>
-                                        <button onclick="openPlayersModal('${id}')" class="text-orange-400 hover:underline">👥 खिलाड़ी देखें</button>
+                                        <span>स्लॉट्स: <b class="text-white">${joined}/${m.slots}</b></span>
+                                        <button onclick="openPlayersModal('${id}')" class="text-yellow-400 hover:underline">👥 खिलाड़ी देखें (${joined})</button>
                                     </div>
-                                    <div class="w-full bg-[#0b0e14] rounded-full h-2 overflow-hidden border border-gray-800">
-                                        <div class="bg-gradient-to-r from-orange-500 to-yellow-400 h-2 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                                    <div class="w-full bg-gray-950 rounded-full h-2 overflow-hidden border border-gray-800">
+                                        <div class="bg-gradient-to-r from-yellow-500 to-orange-500 h-2 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
                                     </div>
                                 </div>
 
-                                <!-- Room Box (Only if Joined) -->
                                 ${alreadyJoined ? `
                                     <div class="bg-gradient-to-r from-green-950/40 to-emerald-950/40 p-2.5 rounded-2xl border border-green-600/40 text-xs space-y-0.5">
                                         <p class="text-[10px] text-green-400 font-bold">🎮 CUSTOM ROOM DETAILS:</p>
@@ -533,13 +596,12 @@
                                     </div>
                                 ` : ''}
 
-                                <!-- Action Button -->
                                 ${alreadyJoined ? `
                                     <button class="w-full bg-gray-800 text-green-400 font-black py-2.5 rounded-2xl text-xs border border-green-500/40 cursor-not-allowed">
                                         ✅ Already Joined
                                     </button>
                                 ` : `
-                                    <button onclick="openJoinModal('${id}')" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-black font-black py-2.5 rounded-2xl text-xs shadow-lg transition">
+                                    <button onclick="openJoinModal('${id}')" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-black font-black py-2.5 rounded-2xl text-xs shadow-lg transition">
                                         JOIN NOW (₹${isDuo ? m.fee * 2 : m.fee})
                                     </button>
                                 `}
@@ -548,9 +610,7 @@
 
                         container.innerHTML += cardHtml;
 
-                        // Add to My Matches if joined
                         if(alreadyJoined) {
-                            myMatchFound = true;
                             myMatchesContainer.innerHTML += cardHtml;
                         }
                     });
@@ -558,13 +618,13 @@
             });
         }
 
-        // JOIN MODAL
         function openJoinModal(id) {
             db.ref('matches/' + id).once('value', snap => {
                 activeMatch = snap.val();
                 activeMatch.id = id;
 
-                const isDuo = activeMatch.title.toLowerCase().includes('duo');
+                const matchMode = (activeMatch.mode || '').toUpperCase();
+                const isDuo = (matchMode.includes('2VS2') || activeMatch.title.toLowerCase().includes('duo'));
                 const totalCost = isDuo ? Number(activeMatch.fee) * 2 : Number(activeMatch.fee);
 
                 document.getElementById('joinFeeWarning').innerText = `एंट्री फीस: ₹${totalCost} (वॉलेट से कटेंगे)`;
@@ -584,11 +644,12 @@
 
         function processMatchJoin() {
             if(!activeMatch) return;
-            const isDuo = activeMatch.title.toLowerCase().includes('duo');
+            const matchMode = (activeMatch.mode || '').toUpperCase();
+            const isDuo = (matchMode.includes('2VS2') || activeMatch.title.toLowerCase().includes('duo'));
             const totalCost = isDuo ? Number(activeMatch.fee) * 2 : Number(activeMatch.fee);
 
             if(myCurrentBalance < totalCost) {
-                alert(`⚠️ अपर्याप्त बैलेंस!\nइस मैच के लिए ₹${totalCost} चाहिए, आपके पास ₹${myCurrentBalance} हैं।\nपहले वॉलेट में कॉइन जोड़ें।`);
+                alert(`⚠️ अपर्याप्त बैलेंस!\nइस मैच के लिए ₹${totalCost} चाहिए, आपके पास ₹${myCurrentBalance} हैं।\nकृपया पहले वॉलेट में कॉइन जोड़ें।`);
                 closeModal('joinModal');
                 openWalletModal();
                 return;
@@ -627,24 +688,25 @@
             });
         }
 
+        // VIEW ALL JOINED PLAYERS (NAME & UID)
         function openPlayersModal(matchId) {
             db.ref('participants/' + matchId).once('value', snap => {
                 const list = document.getElementById('joinedPlayersContent');
                 list.innerHTML = '';
                 const data = snap.val();
                 if(!data) {
-                    list.innerHTML = '<p class="text-gray-400 py-4 text-center">अभी तक किसी ने जॉइन नहीं किया।</p>';
+                    list.innerHTML = '<p class="text-gray-400 py-4 text-center">अभी तक किसी खिलाड़ी ने जॉइन नहीं किया।</p>';
                 } else {
                     let i = 1;
                     for(let key in data) {
                         const p = data[key];
                         list.innerHTML += `
-                            <div class="py-1.5 flex justify-between items-center">
+                            <div class="py-2 flex justify-between items-center">
                                 <div>
-                                    <p class="font-bold text-white">${i++}. ${p.p1Name}</p>
-                                    <p class="text-[10px] text-gray-400 font-mono">UID: ${p.p1Uid}</p>
+                                    <p class="font-bold text-white text-xs">${i++}. ${p.p1Name} <span class="text-yellow-400 font-mono text-[10px]">(${p.p1Uid})</span></p>
+                                    ${p.p2Name ? `<p class="text-[10px] text-gray-400 pl-3">↳ Partner: ${p.p2Name} (${p.p2Uid})</p>` : ''}
                                 </div>
-                                ${p.p2Name ? `<span class="text-[9px] bg-purple-950 text-purple-300 border border-purple-800 px-1.5 py-0.5 rounded">Team: ${p.p2Name}</span>` : ''}
+                                <span class="text-[9px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full font-mono">UID Verified</span>
                             </div>
                         `;
                     }
@@ -669,7 +731,7 @@
                     if(idx === 2) badge = '🥉 3rd';
 
                     list.innerHTML += `
-                        <div class="bg-[#121722] border border-gray-800/80 p-3 rounded-2xl flex justify-between items-center shadow">
+                        <div class="bg-gray-900 border border-gray-800 p-3 rounded-2xl flex justify-between items-center shadow">
                             <div class="flex items-center gap-2.5">
                                 <span class="font-bold text-xs ${idx < 3 ? 'text-yellow-400' : 'text-gray-400'}">${badge}</span>
                                 <div>
@@ -686,7 +748,7 @@
 
         function shareReferral() {
             const code = currentUser.uid;
-            const text = encodeURIComponent(`🔥 Grind Battle (MX E-SPORTS) डाउनलोड करो और Free Fire टूर्नामेंट्स खेलकर जीतो!\n\nमेरा रेफरल कोड: ${code}\nडाउनलोड लिंक: https://s444pg-netizen.github.io/MX-E-SPORTS-/`);
+            const text = encodeURIComponent(`🔥 MX E-SPORTS ऐप डाउनलोड करो और Free Fire टूर्नामेंट्स खेलो!\n\nमेरा रेफरल कोड: ${code}\nडाउनलोड लिंक: https://s444pg-netizen.github.io/MX-E-SPORTS-/`);
             window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         }
 
@@ -711,12 +773,12 @@
             if(view === 'deposit') {
                 document.getElementById('depositSection').classList.remove('hidden');
                 document.getElementById('withdrawSection').classList.add('hidden');
-                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-bold";
+                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
                 document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg text-gray-400 font-bold";
             } else {
                 document.getElementById('depositSection').classList.add('hidden');
                 document.getElementById('withdrawSection').classList.remove('hidden');
-                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-bold";
+                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
                 document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg text-gray-400 font-bold";
             }
         }
@@ -753,4 +815,4 @@
         }
     </script>
 </body>
-                    </html>
+    </html>
