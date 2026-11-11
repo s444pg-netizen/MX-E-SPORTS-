@@ -68,12 +68,21 @@
                 <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400 hover:text-white">💸 Withdraw</button>
             </div>
 
-            <!-- 1. Add Money Section -->
+            <!-- 1. Add Money Section (Live Automatic QR Code) -->
             <div id="depositSection" class="space-y-3">
                 <div class="bg-gray-800/80 p-3 rounded-xl text-center space-y-2 flex flex-col items-center border border-gray-700/60">
                     <p class="text-xs text-gray-300 font-semibold">QR कोड स्कैन करके पेमेंट करें:</p>
-                    <img src="qr.png" alt="UPI QR Code" class="w-36 h-36 rounded-lg border-2 border-yellow-500 p-1 bg-white shadow mx-auto">
-                    <p class="text-[10px] text-gray-400">PhonePe / Google Pay / Paytm</p>
+                    
+                    <!-- 7985589166@fam का ऑटोमैटिक QR कोड -->
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D7985589166%40fam%26pn%3DMX_ESPORTS%26cu%3DINR" 
+                         alt="UPI QR Code" 
+                         class="w-40 h-40 rounded-lg border-2 border-yellow-500 p-1 bg-white shadow mx-auto">
+                    
+                    <p class="text-[10px] text-gray-400">PhonePe / Google Pay / Paytm / FamPay</p>
+                    <div class="bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-700 w-full">
+                        <p class="text-[10px] text-gray-400">या UPI ID पर भेजें:</p>
+                        <p class="font-mono text-xs text-yellow-400 font-bold select-all tracking-wider">7985589166@fam</p>
+                    </div>
                 </div>
 
                 <div class="space-y-2">
@@ -105,7 +114,9 @@
     </div>
 
     <script>
+        // ==========================================
         // अपना FIREBASE CONFIG यहाँ डालें
+        // ==========================================
         const firebaseConfig = {
             apiKey: "1:490438093989:web:45311a4b2cbe6f6f4b714c",
             databaseURL: "https://mx-e-sports-82b3d-default-rtdb.firebaseio.com",
@@ -263,4 +274,4 @@
         }
     </script>
 </body>
-                        </html>
+    </html>
