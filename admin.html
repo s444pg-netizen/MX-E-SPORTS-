@@ -10,7 +10,7 @@
 </head>
 <body class="bg-gray-950 text-white min-h-screen p-3 sm:p-4 font-sans select-none pb-20">
 
-    <!-- Security Lock Screen -->
+    <!-- Lock Screen -->
     <div id="lockScreen" class="fixed inset-0 bg-black flex items-center justify-center p-4 z-50">
         <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4 shadow-2xl">
             <h2 class="text-xl font-bold text-yellow-500">🔒 Admin Access</h2>
@@ -23,7 +23,6 @@
     <!-- Main Dashboard -->
     <div id="mainDashboard" class="max-w-4xl mx-auto hidden space-y-4">
         
-        <!-- Top Header -->
         <header class="flex justify-between items-center bg-gray-900 p-3.5 rounded-2xl border border-gray-800 shadow-xl">
             <div>
                 <h1 class="text-xl font-black text-yellow-500 tracking-wider">🔥 MX E-SPORTS ADMIN</h1>
@@ -32,7 +31,7 @@
             <button onclick="location.reload()" class="bg-red-950/60 text-red-400 border border-red-800/60 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-900 transition">लॉगआउट</button>
         </header>
 
-        <!-- 4 MAIN ADMIN MENUS -->
+        <!-- 4 MAIN TABS -->
         <nav class="flex bg-gray-900 p-1.5 rounded-2xl border border-gray-800 text-xs font-bold gap-1 shadow-lg overflow-x-auto">
             <button onclick="switchAdminTab('matches')" id="btnTabMatches" class="flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold">
                 🎮 1. टूर्नामेंट्स
@@ -49,11 +48,10 @@
         </nav>
 
         <!-- ========================================== -->
-        <!-- MENU 1: CREATE TOURNAMENT & NOTICE & VIDEO -->
+        <!-- MENU 1: CREATE TOURNAMENT & LEADERBOARD    -->
         <!-- ========================================== -->
         <section id="secMatches" class="space-y-4">
-            
-            <!-- LIVE NOTICE & VIDEO LINK BROADCAST TOOL -->
+            <!-- Notice & Video Link -->
             <div class="bg-gray-900 p-4 rounded-2xl border border-yellow-500/30 shadow-xl space-y-3">
                 <h2 class="text-sm font-bold text-yellow-400">📢 ऐप नोटिस और वीडियो लिंक ब्रॉडकास्ट</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -65,28 +63,28 @@
                         </div>
                     </div>
                     <div class="space-y-1.5">
-                        <p class="text-[11px] text-gray-400">लाइव स्ट्रीम / यूट्यूब वीडियो लिंक:</p>
+                        <p class="text-[11px] text-gray-400">यूट्यूब वीडियो लिंक:</p>
                         <div class="flex gap-1.5">
                             <input id="videoLinkInput" type="text" placeholder="https://youtube.com/..." class="p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white">
-                            <button onclick="updateVideoLink()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">सेव लिंक</button>
+                            <button onclick="updateVideoLink()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">सेव</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Create Match Form with 6 Game Mode Dropdown -->
+            <!-- Create Match Form -->
             <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
                 <h2 class="text-sm font-bold text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="text-[10px] text-gray-400 block mb-1">गेम मोड चुनें:</label>
-                        <select id="gameMode" class="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-yellow-400 font-bold focus:outline-none">
-                            <option value="CLASH SQUAD 1VS1">CLASH SQUAD 1VS1</option>
-                            <option value="CLASH SQUAD 2VS2">CLASH SQUAD 2VS2</option>
-                            <option value="SURVIVOR">SURVIVOR</option>
-                            <option value="BERMUDA">BERMUDA</option>
-                            <option value="LONE WOLF">LONE WOLF</option>
-                            <option value="FREE MATCH">FREE MATCH</option>
+                        <select id="gameMode" onchange="togglePerKillInput()" class="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-yellow-400 font-bold focus:outline-none">
+                            <option value="CLASH SQUAD 1VS1">CLASH SQUAD 1VS1 (No Per Kill)</option>
+                            <option value="CLASH SQUAD 2VS2">CLASH SQUAD 2VS2 (No Per Kill)</option>
+                            <option value="SURVIVOR">SURVIVOR (With Per Kill)</option>
+                            <option value="BERMUDA">BERMUDA (With Per Kill)</option>
+                            <option value="LONE WOLF">LONE WOLF (No Per Kill)</option>
+                            <option value="FREE MATCH">FREE MATCH (₹0 Entry + Per Kill)</option>
                         </select>
                     </div>
                     <div>
@@ -96,23 +94,25 @@
                     <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <input id="fee" type="number" placeholder="एंट्री फीस प्रति खिलाड़ी (₹)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                    
+                    <!-- PER KILL INPUT (SHOWN ONLY IF SURVIVOR/BERMUDA/FREE MATCH) -->
+                    <div id="perKillBox">
+                        <input id="perKill" type="number" placeholder="प्रति किल प्राइज (Per Kill ₹)" class="w-full p-2.5 rounded-lg bg-gray-800 border border-orange-500/40 text-xs text-orange-400 font-bold">
+                    </div>
+
                     <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
                     <button onclick="createMatch()" class="md:col-span-2 bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-lg text-xs transition">मैच पब्लिश करें</button>
                 </div>
             </div>
 
-            <!-- Matches List with Room ID Management -->
+            <!-- Matches List -->
             <div class="space-y-3">
                 <h2 class="text-sm font-bold text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
-                <div id="matchesList" class="space-y-3">
-                    <p class="text-gray-500 text-xs text-center py-6">मैचेस लोड हो रहे हैं...</p>
-                </div>
+                <div id="matchesList" class="space-y-3"></div>
             </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- MENU 2: TOTAL USERS & BLOCK SYSTEM         -->
-        <!-- ========================================== -->
+        <!-- MENU 2: USERS & BLOCK -->
         <section id="secUsers" class="space-y-4 hidden">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow flex justify-between items-center">
@@ -135,57 +135,53 @@
             <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
                 <h2 class="text-sm font-bold text-yellow-400">🔍 खिलाड़ी खोजें और ब्लॉक करें</h2>
                 <div class="relative">
-                    <input id="searchUserUid" type="text" onkeyup="filterUsers()" placeholder="खिलाड़ी की UID, नाम या मोबाइल नंबर से खोजें..." class="w-full p-2.5 pl-8 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500">
+                    <input id="searchUserUid" type="text" onkeyup="filterUsers()" placeholder="खिलाड़ी की UID, नाम या मोबाइल से खोजें..." class="w-full p-2.5 pl-8 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500">
                     <span class="absolute left-2.5 top-2.5 text-gray-400 text-xs">🔍</span>
                 </div>
-                <div id="usersListContainer" class="max-h-96 overflow-y-auto space-y-2 pr-1 divide-y divide-gray-800/60">
-                    <p class="text-gray-500 text-xs text-center py-6">खिलाड़ी लोड हो रहे हैं...</p>
-                </div>
+                <div id="usersListContainer" class="max-h-96 overflow-y-auto space-y-2 pr-1 divide-y divide-gray-800/60"></div>
             </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- MENU 3: DEPOSITS                           -->
-        <!-- ========================================== -->
+        <!-- MENU 3: DEPOSITS -->
         <section id="secDeposits" class="space-y-4 hidden">
             <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
-                <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                    <h2 class="text-sm font-bold text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
-                    <span class="text-[11px] text-gray-400">Approve दबाते ही खिलाड़ी के खाते में पैसे जुड़ जाएँगे</span>
-                </div>
-                <div id="depositRequests" class="space-y-2 text-xs min-h-[150px]">
-                    <p class="text-gray-500 text-xs text-center py-6">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>
-                </div>
+                <h2 class="text-sm font-bold text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
+                <div id="depositRequests" class="space-y-2 text-xs min-h-[150px]"></div>
             </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- MENU 4: WITHDRAWALS                        -->
-        <!-- ========================================== -->
+        <!-- MENU 4: WITHDRAWALS -->
         <section id="secWithdrawals" class="space-y-4 hidden">
             <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
-                <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                    <h2 class="text-sm font-bold text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (पैसे भेजना है)</h2>
-                    <span class="text-[11px] text-gray-400">खिलाड़ी की UPI ID पर पैसे भेजकर 'Paid' दबाएँ</span>
-                </div>
-                <div id="withdrawRequests" class="space-y-2 text-xs min-h-[150px]">
-                    <p class="text-gray-500 text-xs text-center py-6">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>
-                </div>
+                <h2 class="text-sm font-bold text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (पैसे भेजना है)</h2>
+                <div id="withdrawRequests" class="space-y-2 text-xs min-h-[150px]"></div>
             </div>
         </section>
-
     </div>
 
-    <!-- User Full Details Modal -->
-    <div id="userDetailsModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-xs space-y-3 shadow-2xl">
-            <h3 class="font-bold text-yellow-400 text-sm border-b border-gray-800 pb-2">📋 खिलाड़ी की पूरी जानकारी</h3>
-            <div id="userDetailsContent" class="text-xs space-y-2"></div>
-            <button onclick="closeModal('userDetailsModal')" class="w-full bg-gray-800 text-white font-bold py-2 rounded-lg text-xs">बंद करें</button>
+    <!-- MODAL: ADD MATCH RESULT & LEADERBOARD -->
+    <div id="resultModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-gray-900 border border-yellow-500/40 p-5 rounded-3xl w-full max-w-sm space-y-3 shadow-2xl my-auto">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <h3 class="font-black text-yellow-400 text-sm">📊 मैच रिजल्ट लीडरबोर्ड दर्ज करें</h3>
+                <button onclick="closeModal('resultModal')" class="text-gray-400 font-bold">&times;</button>
+            </div>
+            
+            <p class="text-[11px] text-gray-300">खिलाड़ी के Kills और जीते हुए Coins डालें (कॉइन खिलाड़ी के बैलेंस में अपने-आप जुड़ जाएँगे):</p>
+
+            <div id="resultPlayersList" class="max-h-60 overflow-y-auto space-y-2.5 pr-1 divide-y divide-gray-800/60 text-xs">
+                <!-- Players dynamically loaded for results -->
+            </div>
+
+            <div class="pt-2">
+                <button onclick="finalizeMatchResults()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">
+                    कन्फर्म रिजल्ट & पब्लिश लीडरबोर्ड
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Players Modal (Joined in Match) -->
+    <!-- Players Modal -->
     <div id="playersModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
         <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
             <h3 class="font-bold text-yellow-400 mb-2 text-sm">👥 मैच में जॉइन किए गए खिलाड़ी</h3>
@@ -194,7 +190,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "1:490438093989:web:45311a4b2cbe6f6f4b714c",
@@ -205,6 +200,7 @@
         const db = firebase.database();
 
         let allUsersData = [];
+        let activeResultMatchId = null;
 
         function checkPin() {
             const pin = document.getElementById('adminPin').value;
@@ -212,12 +208,23 @@
                 document.getElementById('lockScreen').classList.add('hidden');
                 document.getElementById('mainDashboard').classList.remove('hidden');
                 loadNoticeAndVideo();
+                togglePerKillInput();
             } else {
                 alert("गलत पिन!");
             }
         }
 
-        // LOAD AND UPDATE NOTICE / VIDEO
+        function togglePerKillInput() {
+            const mode = document.getElementById('gameMode').value;
+            const hasPerKill = (mode === 'SURVIVOR' || mode === 'BERMUDA' || mode === 'FREE MATCH');
+            const box = document.getElementById('perKillBox');
+            if(hasPerKill) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
         function loadNoticeAndVideo() {
             db.ref('notice').once('value', s => { if(s.val()) document.getElementById('noticeInput').value = s.val(); });
             db.ref('videoLink').once('value', s => { if(s.val()) document.getElementById('videoLinkInput').value = s.val(); });
@@ -230,7 +237,7 @@
 
         function updateVideoLink() {
             const link = document.getElementById('videoLinkInput').value.trim();
-            db.ref('videoLink').set(link).then(() => alert('✅ वीडियो/स्ट्रीम लिंक लाइव सेव हो गया!'));
+            db.ref('videoLink').set(link).then(() => alert('✅ वीडियो लिंक सेव हो गया!'));
         }
 
         function switchAdminTab(tab) {
@@ -254,7 +261,6 @@
             }
         }
 
-        // CREATE MATCH WITH MODE SELECTION
         function createMatch() {
             const mode = document.getElementById('gameMode').value;
             const title = document.getElementById('title').value.trim();
@@ -262,6 +268,9 @@
             const fee = document.getElementById('fee').value.trim();
             const prize = document.getElementById('prize').value.trim();
             const slots = document.getElementById('slots').value || 48;
+            
+            const hasPerKill = (mode === 'SURVIVOR' || mode === 'BERMUDA' || mode === 'FREE MATCH');
+            const perKill = hasPerKill ? (Number(document.getElementById('perKill').value) || 0) : 0;
 
             if(!title || !time || !fee || !prize) return alert('सभी डिटेल्स भरें!');
 
@@ -269,16 +278,18 @@
             matchRef.set({
                 id: matchRef.key,
                 mode,
-                title, time, fee, prize, slots,
+                title, time, fee, prize, perKill, slots,
                 roomId: "", roomPass: "",
                 status: "upcoming",
                 winner: ""
             }).then(() => {
-                alert(`✅ [${mode}] मैच सफलतापूर्वक बन गया!`);
+                alert(`✅ [${mode}] मैच पब्लिश हो गया!`);
                 document.getElementById('title').value = '';
+                document.getElementById('perKill').value = '';
             });
         }
 
+        // LOAD MATCHES WITH MANAGE RESULTS
         db.ref('matches').on('value', snapshot => {
             const container = document.getElementById('matchesList');
             container.innerHTML = '';
@@ -290,30 +301,31 @@
                 db.ref('participants/' + id).once('value', pSnap => {
                     const joinedCount = pSnap.numChildren();
                     container.innerHTML += `
-                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow">
-                            <div class="flex justify-between items-start mb-2">
+                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow space-y-3">
+                            <div class="flex justify-between items-start">
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <h3 class="font-bold text-yellow-400 text-sm">${m.title}</h3>
                                         <span class="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold">${m.mode || 'BERMUDA'}</span>
                                     </div>
-                                    <p class="text-xs text-gray-400">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize}</p>
-                                    <p class="text-xs text-blue-400 font-semibold mt-1">स्लॉट्स: ${joinedCount}/${m.slots} जॉइंड | स्टेटस: ${m.status}</p>
-                                    ${m.winner ? `<p class="text-xs text-green-400 font-bold mt-1">👑 Winner: ${m.winner}</p>` : ''}
+                                    <p class="text-xs text-gray-400">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize} ${m.perKill ? '| Kill: ₹' + m.perKill : ''}</p>
+                                    <p class="text-xs text-blue-400 font-semibold mt-0.5">स्लॉट्स: ${joinedCount}/${m.slots} जॉइंड | स्टेटस: <b class="${m.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}">${m.status}</b></p>
                                 </div>
                                 <button onclick="deleteMatch('${id}')" class="text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40">डिलीट</button>
                             </div>
 
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 my-3">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
                                 <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
                                 <button onclick="updateRoom('${id}')" class="bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold text-white">ID/Pass भेजें</button>
                                 <button onclick="viewPlayers('${id}')" class="bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold text-white">खिलाड़ी देखें (${joinedCount})</button>
                             </div>
 
-                            <div class="flex gap-2 items-center pt-2 border-t border-gray-800">
-                                <input id="win_${id}" type="text" placeholder="विनर का IGN / UID" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
-                                <button onclick="setWinner('${id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black text-xs px-3 py-1.5 rounded font-bold">विनर घोषित करें</button>
+                            <div class="flex flex-col sm:flex-row gap-2 items-center pt-2 border-t border-gray-800">
+                                <input id="win_${id}" type="text" placeholder="Booyah विनर का IGN" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white w-full sm:w-auto">
+                                <button onclick="openResultModal('${id}')" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xs px-3 py-1.5 rounded-lg font-black w-full sm:w-auto">
+                                    📊 रिजल्ट व Kills दर्ज करें
+                                </button>
                             </div>
                         </div>
                     `;
@@ -327,17 +339,85 @@
             db.ref('matches/' + id).update({ roomId, roomPass }).then(() => alert('Room ID और Pass अपडेट हो गया!'));
         }
 
-        function setWinner(id) {
-            const winner = document.getElementById('win_' + id).value;
-            if(!winner) return alert('विनर का नाम लिखें!');
-            db.ref('matches/' + id).update({ winner, status: "completed" }).then(() => alert('विनर घोषित हो गया!'));
-        }
-
         function deleteMatch(id) {
             if(confirm('क्या सच में यह मैच हटाना है?')) {
                 db.ref('matches/' + id).remove();
                 db.ref('participants/' + id).remove();
+                db.ref('match_results/' + id).remove();
             }
+        }
+
+        // OPEN RESULT & LEADERBOARD ENTRY MODAL
+        function openResultModal(matchId) {
+            activeResultMatchId = matchId;
+            const list = document.getElementById('resultPlayersList');
+            list.innerHTML = '';
+
+            db.ref('participants/' + matchId).once('value', snap => {
+                const data = snap.val();
+                if(!data) {
+                    list.innerHTML = '<p class="text-gray-400 py-4 text-center">इस मैच में कोई खिलाड़ी नहीं है।</p>';
+                } else {
+                    for(let key in data) {
+                        const p = data[key];
+                        list.innerHTML += `
+                            <div class="pt-2 space-y-1">
+                                <div class="flex justify-between items-center">
+                                    <p class="font-bold text-white text-xs">${p.p1Name} <span class="text-yellow-400 font-mono text-[10px]">(${p.p1Uid})</span></p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input id="kills_${p.p1Uid}" type="number" placeholder="Kills" value="0" class="p-1 text-xs bg-gray-800 rounded border border-gray-700 text-white">
+                                    <input id="won_${p.p1Uid}" type="number" placeholder="Coins Won (₹)" value="0" class="p-1 text-xs bg-gray-800 rounded border border-gray-700 text-green-400 font-bold">
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                openModal('resultModal');
+            });
+        }
+
+        function finalizeMatchResults() {
+            if(!activeResultMatchId) return;
+            const winnerName = document.getElementById('win_' + activeResultMatchId)?.value || 'Declared';
+
+            db.ref('participants/' + activeResultMatchId).once('value', snap => {
+                const data = snap.val();
+                if(!data) return;
+
+                const resultsData = {};
+
+                for(let key in data) {
+                    const p = data[key];
+                    const uid = p.p1Uid;
+                    const kills = Number(document.getElementById('kills_' + uid)?.value || 0);
+                    const won = Number(document.getElementById('won_' + uid)?.value || 0);
+
+                    resultsData[uid] = {
+                        name: p.p1Name,
+                        uid: uid,
+                        kills: kills,
+                        won: won
+                    };
+
+                    // Auto-Credit Prize Coins to player's wallet balance
+                    if(won > 0) {
+                        db.ref('users/' + uid).once('value', uSnap => {
+                            const curBal = Number(uSnap.val()?.balance || 0);
+                            db.ref('users/' + uid).update({ balance: curBal + won });
+                        });
+                    }
+                }
+
+                db.ref('match_results/' + activeResultMatchId).set(resultsData);
+                db.ref('matches/' + activeResultMatchId).update({
+                    status: 'completed',
+                    winner: winnerName
+                }).then(() => {
+                    alert('✅ मैच रिजल्ट व लीडरबोर्ड पब्लिश हो गया और विनर कॉइन्स जुड़ गए!');
+                    closeModal('resultModal');
+                });
+            });
         }
 
         function viewPlayers(id) {
@@ -393,8 +473,7 @@
                             <p class="text-[11px] text-gray-400 font-mono">UID: <b class="text-yellow-400">${u.uid}</b> | 💰 बैलेंस: ₹${u.balance || 0}</p>
                         </div>
                         <div class="flex items-center gap-1.5 w-full sm:w-auto">
-                            <button onclick="viewUserDetails('${u.uid}')" class="flex-1 sm:flex-none bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1 rounded text-[11px]">जानकारी</button>
-                            <button onclick="quickReward('${u.uid}')" class="flex-1 sm:flex-none bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded text-[11px] font-bold">+कॉइन</button>
+                            <button onclick="quickReward('${u.uid}')" class="flex-1 sm:flex-none bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 px-2.5 py-1 rounded text-[11px] font-bold">+कॉइन</button>
                             <button onclick="toggleBlockUser('${u.uid}', ${isBlocked})" class="flex-1 sm:flex-none ${isBlocked ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'} px-2.5 py-1 rounded text-[11px] font-bold transition">
                                 ${isBlocked ? 'Unblock' : 'Block'}
                             </button>
@@ -420,22 +499,6 @@
             if(confirm(`खिलाड़ी UID: ${uid} को ${actionText} करना चाहते हैं?`)) {
                 db.ref('users/' + uid).update({ isBlocked: newStatus }).then(() => alert(`खिलाड़ी ${actionText} हो गया!`));
             }
-        }
-
-        function viewUserDetails(uid) {
-            const user = allUsersData.find(u => u.uid === uid);
-            if(!user) return;
-            document.getElementById('userDetailsContent').innerHTML = `
-                <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 space-y-1.5 text-xs">
-                    <p><span class="text-gray-400">नाम:</span> <b class="text-white">${user.name}</b></p>
-                    <p><span class="text-gray-400">Free Fire UID:</span> <b class="text-yellow-400 font-mono">${user.uid}</b></p>
-                    <p><span class="text-gray-400">फोन:</span> <b class="text-white">${user.phone || 'N/A'}</b></p>
-                    <p><span class="text-gray-400">पासवर्ड:</span> <b class="text-red-400 font-mono">${user.pass || 'N/A'}</b></p>
-                    <p><span class="text-gray-400">बैलेंस:</span> <b class="text-green-400 font-mono">₹${user.balance || 0}</b></p>
-                    <p><span class="text-gray-400">स्टेटस:</span> <b class="${user.isBlocked ? 'text-red-400' : 'text-green-400'}">${user.isBlocked ? 'Blocked' : 'Active'}</b></p>
-                </div>
-            `;
-            openModal('userDetailsModal');
         }
 
         function sendCoinsToUser() {
@@ -524,4 +587,4 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
     </script>
 </body>
-                    </html>
+    </html>
