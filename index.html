@@ -175,7 +175,7 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- TAB 4: PROFILE & EDIT                      -->
+        <!-- TAB 4: PROFILE & SETTINGS                  -->
         <!-- ========================================== -->
         <section id="viewProfile" class="max-w-md mx-auto p-3.5 space-y-4 hidden">
             <div class="bg-gray-900 p-4 rounded-3xl border border-gray-800 space-y-3 shadow-xl">
@@ -235,6 +235,10 @@
                     <span class="flex items-center gap-2">📢 ऑफिशियल WhatsApp चैनल</span>
                     <span>➔</span>
                 </a>
+                <button onclick="openRedeemRewardModal()" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-950 hover:bg-gray-800 border border-yellow-500/30 text-yellow-400 font-bold transition">
+                    <span class="flex items-center gap-2">🎁 Redeem Reward</span>
+                    <span>➔</span>
+                </button>
                 <button onclick="alert('नियम:\n1. कोई हैकर अलाउड नहीं है।\n2. 15 मिनट पहले रूम में आएँ।\n3. रूम पासवर्ड किसी को शेयर न करें।')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-950 hover:bg-gray-800 border border-gray-800 text-gray-300 font-bold transition">
                     <span class="flex items-center gap-2">📜 टूर्नामेंट फेयर प्ले नियम</span>
                     <span>➔</span>
@@ -320,7 +324,28 @@
         </div>
     </div>
 
-    <!-- MODAL: WALLET (DEPOSIT, WITHDRAW, REDEEM CODE & PASSBOOK) -->
+    <!-- MODAL: REDEEM REWARD (SETTINGS / PROFILE) -->
+    <div id="redeemRewardModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-gray-900 border border-yellow-500/40 p-5 rounded-3xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <h3 class="font-black text-yellow-400 text-sm">🎁 Redeem Reward</h3>
+                <button onclick="closeModal('redeemRewardModal')" class="text-gray-400 font-bold">&times;</button>
+            </div>
+            <div class="bg-gray-950 p-3 rounded-2xl border border-gray-800 text-center space-y-1">
+                <p class="text-2xl">🎉</p>
+                <p class="text-xs font-bold text-white">YouTube / Giveaway कोड डालें</p>
+                <p class="text-[10px] text-gray-400">कोड डालकर तुरंत अपने वॉलेट में कॉइन पाएं!</p>
+            </div>
+            <div class="space-y-2">
+                <input id="redeemRewardCodeInput" type="text" placeholder="यहाँ कोड डालें (जैसे: MX100)" class="w-full p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs text-yellow-400 font-mono uppercase tracking-wider focus:outline-none focus:border-yellow-500">
+                <button id="redeemRewardSubmitBtn" onclick="submitRedeemReward()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">
+                    🎁 क्लेम करें (Claim Reward)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: WALLET (DEPOSIT, WITHDRAW, GOOGLE PLAY REDEEM CODE, PASSBOOK) -->
     <div id="walletModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-gray-900 border border-yellow-500/30 p-5 rounded-3xl w-full max-w-sm space-y-3 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-2">
@@ -331,12 +356,20 @@
                 <button onclick="closeModal('walletModal')" class="text-gray-400 font-bold">&times;</button>
             </div>
 
-            <!-- 4 SUB TABS (DEPOSIT, WITHDRAW, REDEEM, PASSBOOK) -->
+            <!-- 4 SUB TABS -->
             <div class="flex bg-gray-950 p-1 rounded-xl text-[10px] font-bold text-center border border-gray-800 gap-1">
-                <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">➕ Add</button>
-                <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400">💸 Withdraw</button>
-                <button onclick="toggleWalletView('redeem')" id="btnRedeem" class="flex-1 py-1.5 rounded-lg text-gray-400">🎟️ Redeem</button>
-                <button onclick="toggleWalletView('passbook')" id="btnPass" class="flex-1 py-1.5 rounded-lg text-gray-400">📜 पासबुक</button>
+                <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black flex items-center justify-center gap-1">➕ Add</button>
+                <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400 flex items-center justify-center gap-1">💸 Withdraw</button>
+                <button onclick="toggleWalletView('playRedeem')" id="btnPlayRedeem" class="flex-1 py-1.5 rounded-lg text-gray-400 flex items-center justify-center gap-1">
+                    <svg class="w-3.5 h-3.5 inline-block shrink-0" viewBox="0 0 24 24">
+                        <path fill="#00E676" d="M3.61,1.814L13.793,12L3.61,22.186C3.229,21.797,3,21.257,3,20.66V3.34C3,2.743,3.229,2.203,3.61,1.814Z"/>
+                        <path fill="#00B0FF" d="M17.27,8.523L13.793,12L17.27,15.477L21.11,13.285C21.84,12.868,21.84,11.132,21.11,10.715L17.27,8.523Z"/>
+                        <path fill="#FF3D00" d="M17.27,15.477L13.793,12L3.61,22.186C4.01,22.593,4.61,22.69,5.19,22.36L17.27,15.477Z"/>
+                        <path fill="#FFC400" d="M17.27,8.523L5.19,1.64C4.61,1.31,4.01,1.407,3.61,1.814L13.793,12L17.27,8.523Z"/>
+                    </svg>
+                    <span>Play</span>
+                </button>
+                <button onclick="toggleWalletView('passbook')" id="btnPass" class="flex-1 py-1.5 rounded-lg text-gray-400 flex items-center justify-center gap-1">📜 पासबुक</button>
             </div>
 
             <!-- TAB 1: DEPOSIT -->
@@ -371,22 +404,29 @@
                 </div>
             </div>
 
-            <!-- TAB 3: REDEEM CODE -->
-            <div id="redeemSection" class="space-y-3 hidden">
-                <div class="bg-gray-950 p-3 rounded-2xl border border-yellow-500/30 text-center space-y-1">
-                    <p class="text-2xl">🎁</p>
-                    <p class="text-xs font-black text-yellow-400">रिडीम कोड से तुरंत कॉइन पाएं</p>
-                    <p class="text-[10px] text-gray-400">ऑफिशियल रिडीम कोड दर्ज करें और वॉलेट में बैलेंस जोड़ें।</p>
+            <!-- TAB 3: GOOGLE PLAY REDEEM CODE -->
+            <div id="playRedeemSection" class="space-y-3 hidden">
+                <div class="bg-gray-950 p-3 rounded-2xl border border-emerald-500/30 text-center space-y-1.5">
+                    <div class="w-11 h-11 mx-auto rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center shadow">
+                        <svg class="w-7 h-7" viewBox="0 0 24 24">
+                            <path fill="#00E676" d="M3.61,1.814L13.793,12L3.61,22.186C3.229,21.797,3,21.257,3,20.66V3.34C3,2.743,3.229,2.203,3.61,1.814Z"/>
+                            <path fill="#00B0FF" d="M17.27,8.523L13.793,12L17.27,15.477L21.11,13.285C21.84,12.868,21.84,11.132,21.11,10.715L17.27,8.523Z"/>
+                            <path fill="#FF3D00" d="M17.27,15.477L13.793,12L3.61,22.186C4.01,22.593,4.61,22.69,5.19,22.36L17.27,15.477Z"/>
+                            <path fill="#FFC400" d="M17.27,8.523L5.19,1.64C4.61,1.31,4.01,1.407,3.61,1.814L13.793,12L17.27,8.523Z"/>
+                        </svg>
+                    </div>
+                    <p class="text-xs font-black text-emerald-400">Google Play Redeem Code</p>
+                    <p class="text-[10px] text-gray-400">अपने वॉलेट बैलेंस से Google Play रिडीम कोड प्राप्त करें</p>
                 </div>
                 <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] text-gray-400 space-y-1">
-                    <p class="text-yellow-400 font-bold">📌 नियम:</p>
-                    <p>• एक खिलाड़ी एक कोड को केवल 1 बार इस्तेमाल कर सकता है।</p>
-                    <p>• कोड लागू होते ही पैसे तुरंत वॉलेट में आ जाएँगे।</p>
+                    <p class="text-yellow-400 font-bold">⚠️ नियम:</p>
+                    <p>• आपके वॉलेट में जितना बैलेंस है, केवल उतना ही अमाउंट डाल सकते हैं।</p>
+                    <p>• वेरिफाई करने के 2 घंटे में कोड आपके पासबुक सेक्शन में आ जाएगा।</p>
                 </div>
                 <div class="space-y-2">
-                    <input id="redeemCodeInput" type="text" placeholder="रिडीम कोड डालें (जैसे: MX50)" class="w-full p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs text-yellow-400 font-mono uppercase tracking-wider focus:outline-none focus:border-yellow-500">
-                    <button id="redeemSubmitBtn" onclick="submitRedeemCode()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow transition">
-                        🎟️ कोड रिडीम करें (Claim Now)
+                    <input id="playRedeemAmount" type="number" placeholder="Enter your amount (₹)" class="w-full p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <button id="playRedeemSubmitBtn" onclick="submitPlayRedeem()" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:opacity-90 text-white font-black py-2.5 rounded-xl text-xs shadow transition">
+                        Verify & Redeem
                     </button>
                 </div>
             </div>
@@ -415,13 +455,15 @@
         let myCurrentBalance = 0;
         let activeMatch = null;
         let selectedModeFilter = 'ALL';
-        let isRedeeming = false;
+        let isRedeemingReward = false;
+        let isRequestingPlayCode = false;
 
         let cachedMatches = {};
         let cachedParticipants = {};
         let cachedResults = {};
         let cachedDeposits = {};
         let cachedWithdrawals = {};
+        let cachedPlayRedeems = {};
         let cachedRedemptions = {};
 
         window.onload = function() {
@@ -480,6 +522,11 @@
                 renderPassbook();
             });
 
+            db.ref('play_redeem_requests').on('value', snap => {
+                cachedPlayRedeems = snap.val() || {};
+                renderPassbook();
+            });
+
             db.ref('redeem_history').on('value', snap => {
                 cachedRedemptions = snap.val() || {};
                 renderPassbook();
@@ -512,13 +559,25 @@
             db.ref('users/' + uid).once('value', snap => {
                 if(snap.exists()) return alert('इस UID से पहले ही अकाउंट है!');
 
-                const userData = { name, uid, phone, pass, balance: 0, isBlocked: false, createdAt: Date.now() };
+                const userData = { name, uid, phone, pass, balance: 0, isBlocked: false, referredBy: refCode || '', createdAt: Date.now() };
 
                 if(refCode && refCode !== uid) {
                     db.ref('users/' + refCode).once('value', rSnap => {
                         if(rSnap.exists()) {
-                            const cur = Number(rSnap.val().balance || 0);
+                            const referrer = rSnap.val();
+                            const cur = Number(referrer.balance || 0);
                             db.ref('users/' + refCode).update({ balance: cur + 5 });
+
+                            // SEND REFERRAL NOTIFICATION TO ADMIN
+                            db.ref('referral_notifications').push({
+                                referrerUid: refCode,
+                                referrerName: referrer.name || 'Unknown',
+                                newUserUid: uid,
+                                newUserName: name,
+                                bonus: 5,
+                                read: false,
+                                time: Date.now()
+                            });
                         }
                     });
                 }
@@ -791,7 +850,6 @@
         }
 
         function openJoinModal(id) {
-            // STRICT BLOCK CHECK
             if(currentUser && currentUser.isBlocked) {
                 return alert("❌ आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है! आप मैच जॉइन नहीं कर सकते (Action Failed)।");
             }
@@ -824,7 +882,6 @@
         function processMatchJoin() {
             if(!activeMatch) return;
 
-            // STRICT BLOCK CHECK
             if(currentUser && currentUser.isBlocked) {
                 return alert("❌ आपका अकाउंट ब्लॉक है! आप मैच में भाग नहीं ले सकते।");
             }
@@ -848,7 +905,6 @@
                 if(!p2Name || !p2Uid) return alert('Duo पार्टनर की जानकारी भरें!');
             }
 
-            // CHECK SLOTS STRICTLY FROM FIREBASE
             db.ref('participants/' + activeMatch.id).once('value', snap => {
                 const matchParts = snap.val() || {};
                 let currentSlots = 0;
@@ -866,7 +922,6 @@
                     return alert(`⚠️ यह मैच पूरी तरह भर चुका है (Match Full)!\nकुल स्लॉट्स: ${maxLimit} | भरे हुए: ${currentSlots}\nअब इसमें और खिलाड़ी जॉइन नहीं हो सकते।`);
                 }
 
-                // DEDUCT BALANCE AND JOIN
                 const newBal = myCurrentBalance - totalCost;
                 db.ref('users/' + currentUser.uid).update({ balance: newBal });
 
@@ -1010,28 +1065,36 @@
             renderPassbook();
         }
 
+        function openRedeemRewardModal() {
+            if(currentUser && currentUser.isBlocked) {
+                return alert("❌ आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है!");
+            }
+            document.getElementById('redeemRewardModal').classList.remove('hidden');
+            document.getElementById('redeemRewardModal').classList.add('flex');
+        }
+
         function toggleWalletView(view) {
-            ['depositSection', 'withdrawSection', 'redeemSection', 'passbookSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            ['btnDep', 'btnWth', 'btnRedeem', 'btnPass'].forEach(id => document.getElementById(id).className = "flex-1 py-1.5 rounded-lg text-gray-400");
+            ['depositSection', 'withdrawSection', 'playRedeemSection', 'passbookSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['btnDep', 'btnWth', 'btnPlayRedeem', 'btnPass'].forEach(id => document.getElementById(id).className = "flex-1 py-1.5 rounded-lg text-gray-400 flex items-center justify-center gap-1");
 
             if(view === 'deposit') {
                 document.getElementById('depositSection').classList.remove('hidden');
-                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
+                document.getElementById('btnDep').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold flex items-center justify-center gap-1";
             } else if(view === 'withdraw') {
                 document.getElementById('withdrawSection').classList.remove('hidden');
-                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
-            } else if(view === 'redeem') {
-                document.getElementById('redeemSection').classList.remove('hidden');
-                document.getElementById('btnRedeem').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
+                document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold flex items-center justify-center gap-1";
+            } else if(view === 'playRedeem') {
+                document.getElementById('playRedeemSection').classList.remove('hidden');
+                document.getElementById('btnPlayRedeem').className = "flex-1 py-1.5 rounded-lg bg-emerald-500 text-black font-bold flex items-center justify-center gap-1";
             } else if(view === 'passbook') {
                 document.getElementById('passbookSection').classList.remove('hidden');
-                document.getElementById('btnPass').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
+                document.getElementById('btnPass').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold flex items-center justify-center gap-1";
                 renderPassbook();
             }
         }
 
         // ==========================================
-        // SUBMIT DEPOSIT (WITH BLOCK CHECK & 2-HOUR NOTICE)
+        // SUBMIT DEPOSIT
         // ==========================================
         function submitDeposit() {
             if(currentUser && currentUser.isBlocked) {
@@ -1058,7 +1121,7 @@
         }
 
         // ==========================================
-        // SUBMIT WITHDRAW (WITH BLOCK CHECK)
+        // SUBMIT WITHDRAW
         // ==========================================
         function submitWithdraw() {
             if(currentUser && currentUser.isBlocked) {
@@ -1071,7 +1134,6 @@
 
             if(amount > myCurrentBalance) return alert(`आपके पास केवल ₹${myCurrentBalance} हैं!`);
 
-            // Deduct balance
             db.ref('users/' + currentUser.uid).update({ balance: myCurrentBalance - amount });
             
             db.ref('withdrawals').push({ 
@@ -1090,33 +1152,90 @@
         }
 
         // ==========================================
-        // SUBMIT REDEEM CODE (WITH BLOCK & LIMIT CHECK)
+        // SUBMIT GOOGLE PLAY REDEEM CODE REQUEST
         // ==========================================
-        function submitRedeemCode() {
-            if(isRedeeming) return;
+        function submitPlayRedeem() {
+            if(isRequestingPlayCode) return;
 
             if(currentUser && currentUser.isBlocked) {
-                return alert("❌ आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है! आप रिडीम कोड इस्तेमाल नहीं कर सकते।");
+                return alert("❌ आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है! रिडीम फेल्ड (Failed)।");
             }
 
-            const code = document.getElementById('redeemCodeInput').value.trim().toUpperCase();
-            if(!code) return alert('कृपया अपना रिडीम कोड दर्ज करें!');
+            const amount = Number(document.getElementById('playRedeemAmount').value);
+            if(!amount || amount <= 0) return alert('सही अमाउंट (₹) भरें!');
 
-            const btn = document.getElementById('redeemSubmitBtn');
-            isRedeeming = true;
+            if(amount > myCurrentBalance) {
+                return alert(`❌ वेरिफाई नहीं हो सका!\nआपके वॉलेट में केवल ₹${myCurrentBalance} हैं, आप इससे ज्यादा अमाउंट नहीं डाल सकते।`);
+            }
+
+            const btn = document.getElementById('playRedeemSubmitBtn');
+            isRequestingPlayCode = true;
+            btn.disabled = true;
+            btn.innerText = 'Verify हो रहा है...';
+
+            const resetBtn = () => {
+                isRequestingPlayCode = false;
+                btn.disabled = false;
+                btn.innerText = 'Verify & Redeem';
+            };
+
+            db.ref('users/' + currentUser.uid + '/balance').transaction(bal => {
+                const current = Number(bal) || 0;
+                if(current < amount) return; // abort
+                return current - amount;
+            }, (error, committed) => {
+                if(error || !committed) {
+                    resetBtn();
+                    return alert('❌ पर्याप्त बैलेंस नहीं है!');
+                }
+
+                db.ref('play_redeem_requests').push({
+                    userName: currentUser.name,
+                    uid: currentUser.uid,
+                    amount: amount,
+                    code: '',
+                    status: 'pending',
+                    time: Date.now()
+                }).then(() => {
+                    alert('✅ आपका रिडीम सक्सेस! 2 घंटे में आपके पासबुक सेक्शन में आ जाएगा।');
+                    document.getElementById('playRedeemAmount').value = '';
+                    resetBtn();
+                    toggleWalletView('passbook');
+                }).catch(() => {
+                    resetBtn();
+                    alert('❌ नेटवर्क समस्या! कृपया दोबारा कोशिश करें।');
+                });
+            });
+        }
+
+        // ==========================================
+        // SUBMIT REDEEM REWARD (SETTINGS / YOUTUBE CODE)
+        // ==========================================
+        function submitRedeemReward() {
+            if(isRedeemingReward) return;
+
+            if(currentUser && currentUser.isBlocked) {
+                return alert("❌ आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है! आप रिडीम रिवॉर्ड इस्तेमाल नहीं कर सकते।");
+            }
+
+            const code = document.getElementById('redeemRewardCodeInput').value.trim().toUpperCase();
+            if(!code) return alert('कृपया अपना कोड डालें!');
+
+            const btn = document.getElementById('redeemRewardSubmitBtn');
+            isRedeemingReward = true;
             btn.disabled = true;
             btn.innerText = 'चेक हो रहा है...';
 
             const resetBtn = () => {
-                isRedeeming = false;
+                isRedeemingReward = false;
                 btn.disabled = false;
-                btn.innerText = '🎟️ कोड रिडीम करें (Claim Now)';
+                btn.innerText = '🎁 क्लेम करें (Claim Reward)';
             };
 
             db.ref('redeem_codes/' + code).once('value').then(snap => {
                 if(!snap.exists()) {
                     resetBtn();
-                    return alert('❌ यह रिडीम कोड गलत है या मौजूद नहीं है!');
+                    return alert('❌ यह कोड गलत है या मौजूद नहीं है!');
                 }
 
                 const data = snap.val();
@@ -1124,35 +1243,34 @@
 
                 if(!amount || amount <= 0) {
                     resetBtn();
-                    return alert('❌ यह रिडीम कोड अमान्य है!');
+                    return alert('❌ यह कोड अमान्य है!');
                 }
 
                 if(typeof data === 'object') {
                     if(data.active === false) {
                         resetBtn();
-                        return alert('❌ यह रिडीम कोड अब बंद (Inactive) हो चुका है!');
+                        return alert('❌ यह कोड अब बंद (Inactive) हो चुका है!');
                     }
                     if(data.expiry && Date.now() > Number(data.expiry)) {
                         resetBtn();
-                        return alert('❌ यह रिडीम कोड एक्सपायर हो चुका है!');
+                        return alert('❌ यह कोड एक्सपायर हो चुका है!');
                     }
                     if(data.usedBy && data.usedBy[currentUser.uid]) {
                         resetBtn();
-                        return alert('⚠️ आप यह रिडीम कोड पहले ही इस्तेमाल कर चुके हैं!');
+                        return alert('⚠️ आप यह कोड पहले ही इस्तेमाल कर चुके हैं!');
                     }
                     if(data.maxUses && Number(data.usedCount || 0) >= Number(data.maxUses)) {
                         resetBtn();
-                        return alert('⚠️ इस रिडीम कोड की लिमिट पूरी हो चुकी है!');
+                        return alert('⚠️ इस कोड की इस्तेमाल करने की लिमिट पूरी हो चुकी है!');
                     }
                 }
 
                 db.ref('users/' + currentUser.uid + '/redeemedCodes/' + code).once('value').then(uSnap => {
                     if(uSnap.exists()) {
                         resetBtn();
-                        return alert('⚠️ आप यह रिडीम कोड पहले ही इस्तेमाल कर चुके हैं!');
+                        return alert('⚠️ आप यह कोड पहले ही इस्तेमाल कर चुके हैं!');
                     }
 
-                    // Add amount to user balance safely
                     db.ref('users/' + currentUser.uid + '/balance').transaction(bal => {
                         return (Number(bal) || 0) + amount;
                     }).then(() => {
@@ -1171,10 +1289,10 @@
                             status: 'approved',
                             time: Date.now()
                         }).then(() => {
-                            alert(`🎉 बधाई हो! रिडीम कोड "${code}" लागू हो गया!\n₹${amount} आपके वॉलेट में जोड़ दिए गए हैं।`);
-                            document.getElementById('redeemCodeInput').value = '';
+                            alert(`🎉 बधाई हो! कोड "${code}" क्लेम हो गया!\n₹${amount} आपके वॉलेट में जोड़ दिए गए हैं।`);
+                            document.getElementById('redeemRewardCodeInput').value = '';
                             resetBtn();
-                            toggleWalletView('passbook');
+                            closeModal('redeemRewardModal');
                         });
                     }).catch(() => {
                         resetBtn();
@@ -1185,6 +1303,35 @@
                 resetBtn();
                 alert('❌ सर्वर से कनेक्ट नहीं हो सका।');
             });
+        }
+
+        // COPY CODE HELPER (WORKS ON BOTH BROWSER & ANDROID WEBVIEW APK)
+        function copyCodeText(text) {
+            if(!text) return;
+            if(navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✅ कोड कॉपी हो गया:\n' + text);
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            try {
+                document.execCommand('copy');
+                alert('✅ कोड कॉपी हो गया:\n' + text);
+            } catch(e) {
+                alert('कोड: ' + text);
+            }
+            document.body.removeChild(ta);
         }
 
         // ==========================================
@@ -1224,16 +1371,31 @@
                 }
             }
 
-            // Get Redeem Codes
+            // Get Google Play Redeem Code Requests (ONLY FOR THIS USER)
+            for(let key in cachedPlayRedeems) {
+                const p = cachedPlayRedeems[key];
+                if(p.uid === currentUser.uid) {
+                    transactions.push({
+                        type: 'PlayRedeem',
+                        amount: p.amount,
+                        time: p.time || 0,
+                        status: p.status,
+                        playCode: p.code || '',
+                        detail: p.code ? `Play Code: ${p.code}` : '2 घंटे में कोड यहाँ आएगा'
+                    });
+                }
+            }
+
+            // Get Redeem Reward History
             for(let key in cachedRedemptions) {
                 const r = cachedRedemptions[key];
                 if(r.uid === currentUser.uid) {
                     transactions.push({
-                        type: 'Redeem',
+                        type: 'RedeemReward',
                         amount: r.amount,
                         time: r.time || 0,
                         status: r.status || 'approved',
-                        detail: `Code: ${r.code}`
+                        detail: `Reward Code: ${r.code}`
                     });
                 }
             }
@@ -1243,40 +1405,54 @@
                 return;
             }
 
-            // Sort by latest time
             transactions.sort((a,b) => b.time - a.time);
 
             container.innerHTML = '';
             transactions.forEach(t => {
-                const isCredit = (t.type === 'Deposit' || t.type === 'Redeem');
-                const isSuccess = (t.status === 'approved' || t.status === 'paid');
+                const isCredit = (t.type === 'Deposit' || t.type === 'RedeemReward');
+                const isSuccess = (t.status === 'approved' || t.status === 'paid' || t.status === 'sent');
                 const isProcessing = (t.status === 'pending');
 
                 let titleText = '📤 विड्रॉल (Cashout)';
-                if(t.type === 'Deposit') titleText = '📥 डिपॉजिट (Add Money)';
-                if(t.type === 'Redeem') titleText = '🎁 रिडीम कोड (Redeem)';
+                let titleColor = 'text-yellow-400';
+                if(t.type === 'Deposit') { titleText = '📥 डिपॉजिट (Add Money)'; titleColor = 'text-green-400'; }
+                if(t.type === 'RedeemReward') { titleText = '🎁 रिडीम रिवॉर्ड (Reward)'; titleColor = 'text-green-400'; }
+                if(t.type === 'PlayRedeem') { titleText = '▶ Google Play Redeem'; titleColor = 'text-emerald-400'; }
 
                 const dateStr = t.time ? new Date(t.time).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A';
 
+                let statusLabel = '❌ Failed / Refunded';
+                if(isProcessing) statusLabel = '⏳ Processing';
+                else if(t.type === 'PlayRedeem' && isSuccess) statusLabel = '✅ Code Ready';
+                else if(isSuccess) statusLabel = '✅ Success';
+
+                const safeCode = (t.playCode || '').replace(/'/g, "\\'");
+
                 container.innerHTML += `
-                    <div class="py-2.5 flex justify-between items-center">
-                        <div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-bold text-xs ${isCredit ? 'text-green-400' : 'text-yellow-400'}">
-                                    ${titleText}
+                    <div class="py-2.5 space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-xs ${titleColor}">${titleText}</span>
+                                <p class="text-[10px] text-gray-400 font-mono">${dateStr}</p>
+                                ${t.type !== 'PlayRedeem' || !t.playCode ? `<p class="text-[10px] text-gray-500">${t.detail}</p>` : ''}
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black font-mono text-xs ${isCredit ? 'text-green-400' : 'text-yellow-400'}">
+                                    ${isCredit ? '+' : '-'}₹${t.amount}
+                                </p>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${isProcessing ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 animate-pulse' : (isSuccess ? 'bg-green-500/20 text-green-400 border border-green-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40')}">
+                                    ${statusLabel}
                                 </span>
                             </div>
-                            <p class="text-[10px] text-gray-400 font-mono">${dateStr}</p>
-                            <p class="text-[10px] text-gray-500">${t.detail}</p>
                         </div>
-                        <div class="text-right">
-                            <p class="font-black font-mono text-xs ${isCredit ? 'text-green-400' : 'text-yellow-400'}">
-                                ${isCredit ? '+' : '-'}₹${t.amount}
-                            </p>
-                            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${isProcessing ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 animate-pulse' : (isSuccess ? 'bg-green-500/20 text-green-400 border border-green-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40')}">
-                                ${isProcessing ? '⏳ Processing' : (isSuccess ? '✅ Success' : '❌ Failed')}
-                            </span>
-                        </div>
+                        ${t.type === 'PlayRedeem' && t.playCode ? `
+                            <div class="bg-gray-950 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between gap-2">
+                                <span class="font-mono text-[11px] font-bold text-emerald-400 select-all break-all">${t.playCode}</span>
+                                <button onclick="copyCodeText('${safeCode}')" class="bg-emerald-500 hover:bg-emerald-600 text-black font-black text-[10px] px-2.5 py-1 rounded-lg shrink-0">
+                                    📋 Copy
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             });
