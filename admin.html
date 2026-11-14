@@ -1,1 +1,641 @@
-{"response":"<!DOCTYPE html><html lang=\"hi\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\"><meta http-equiv=\"Pragma\" content=\"no-cache\"><meta http-equiv=\"Expires\" content=\"0\"><title>MX E-SPORTS - Master Admin</title><script src=\"https://cdn.tailwindcss.com\"></script><script src=\"https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js\"></script><script src=\"https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js\"></script></head><body class=\"bg-gray-950 text-white min-h-screen p-3 sm:p-4 font-sans select-none pb-24\"><div id=\"lockScreen\" class=\"fixed inset-0 bg-black flex items-center justify-center p-4 z-50\"><div class=\"bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4 shadow-2xl\"><h2 class=\"text-xl font-bold text-yellow-500\">🔒 Admin Access</h2><p class=\"text-xs text-gray-400\">एडमिन पिन दर्ज करें (Default: 1234)</p><input id=\"adminPin\" type=\"password\" placeholder=\"Enter PIN\" class=\"w-full p-2.5 rounded bg-gray-800 border border-gray-700 text-center tracking-widest text-lg focus:outline-none focus:border-yellow-500 text-white\"><button onclick=\"checkPin()\" class=\"w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded text-sm transition\">लॉगिन करें</button></div></div><div id=\"mainDashboard\" class=\"max-w-4xl mx-auto hidden space-y-4\"><header class=\"flex justify-between items-center bg-gray-900 p-3.5 rounded-2xl border border-gray-800 shadow-xl\"><div><h1 class=\"text-xl font-black text-yellow-500 tracking-wider\">🔥 MX E-SPORTS ADMIN</h1><p class=\"text-[11px] text-gray-400\">मास्टर कंट्रोल पैनल</p></div><div class=\"flex items-center gap-2\"><button onclick=\"openReferAlertsModal()\" class=\"bg-gray-800 text-yellow-400 border border-yellow-500/40 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-gray-700 transition\">🔔 Refer <span id=\"referBadgeCount\" class=\"hidden bg-red-600 text-white text-[10px] px-1.5 rounded-full ml-1\">0</span></button><button onclick=\"location.reload()\" class=\"bg-red-950/60 text-red-400 border border-red-800/60 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-900 transition\">लॉगआउट</button></div></header><nav class=\"flex bg-gray-900 p-1.5 rounded-2xl border border-gray-800 text-xs font-bold gap-1 shadow-lg overflow-x-auto\"><button onclick=\"switchAdminTab('matches')\" id=\"btnTabMatches\" class=\"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\">🎮 1. टूर्नामेंट्स</button><button onclick=\"switchAdminTab('users')\" id=\"btnTabUsers\" class=\"flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold\">👥 2. खिलाड़ी &amp; पूरा हिसाब</button><button onclick=\"switchAdminTab('deposits')\" id=\"btnTabDeposits\" class=\"flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold\">➕ 3. डिपॉजिट</button><button onclick=\"switchAdminTab('withdrawals')\" id=\"btnTabWithdrawals\" class=\"flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold\">💸 4. विड्रॉल</button><button onclick=\"switchAdminTab('playRedeem')\" id=\"btnTabPlayRedeem\" class=\"flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold\">▶ 5. Play Redeem Code</button><button onclick=\"switchAdminTab('redeemReward')\" id=\"btnTabRedeemReward\" class=\"flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold\">🎁 6. Redeem Reward</button></nav><section id=\"secMatches\" class=\"space-y-4\"><div class=\"bg-gray-900 p-4 rounded-2xl border border-yellow-500/30 shadow-xl space-y-3\"><h2 class=\"text-sm font-bold text-yellow-400\">📢 ऐप नोटिस और वीडियो लिंक ब्रॉडकास्ट</h2><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\"><div class=\"space-y-1.5\"><p class=\"text-[11px] text-gray-400\">ऐप पर दौड़ने वाला नोटिस:</p><div class=\"flex gap-1.5\"><input id=\"noticeInput\" type=\"text\" placeholder=\"उदा: आज शाम 8 बजे फ्री टूर्नामेंट...\" class=\"p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white\"><button onclick=\"updateNotice()\" class=\"bg-yellow-500 text-black px-3 py-1.5 rounded-lg font-bold text-xs\">अपडेट</button></div></div><div class=\"space-y-1.5\"><p class=\"text-[11px] text-gray-400\">यूट्यूब वीडियो लिंक:</p><div class=\"flex gap-1.5\"><input id=\"videoLinkInput\" type=\"text\" placeholder=\"https://youtube.com/...\" class=\"p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white\"><button onclick=\"updateVideoLink()\" class=\"bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs\">सेव</button></div></div></div></div><div class=\"bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3\"><h2 class=\"text-sm font-bold text-orange-400\">➕ नया टूर्नामेंट बनाएँ</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-3\"><div><label class=\"text-[10px] text-gray-400 block mb-1\">गेम मोड चुनें:</label><select id=\"gameMode\" onchange=\"togglePerKillInput()\" class=\"w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-yellow-400 font-bold focus:outline-none\"><option value=\"CLASH SQUAD 1VS1\">CLASH SQUAD 1VS1 (No Per Kill)</option><option value=\"CLASH SQUAD 2VS2\">CLASH SQUAD 2VS2 (No Per Kill)</option><option value=\"SURVIVOR\">SURVIVOR (With Per Kill)</option><option value=\"BERMUDA\">BERMUDA (With Per Kill)</option><option value=\"LONE WOLF\">LONE WOLF (No Per Kill)</option><option value=\"FREE MATCH\">FREE MATCH (₹0 Entry + Per Kill)</option></select></div><div><label class=\"text-[10px] text-gray-400 block mb-1\">मैच का नाम:</label><input id=\"title\" type=\"text\" placeholder=\"उदा: Bermuda Solo Battle #1\" class=\"w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white\"></div><input id=\"time\" type=\"text\" placeholder=\"तारीख और समय (उदा: Today 8:00 PM)\" class=\"p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white\"><input id=\"fee\" type=\"number\" placeholder=\"एंट्री फीस प्रति खिलाड़ी (₹)\" class=\"p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white\"><input id=\"prize\" type=\"number\" placeholder=\"प्राइज पूल (₹)\" class=\"p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white\"><div id=\"perKillBox\"><input id=\"perKill\" type=\"number\" placeholder=\"प्रति किल प्राइज (Per Kill ₹)\" class=\"w-full p-2.5 rounded-lg bg-gray-800 border border-orange-500/40 text-xs text-orange-400 font-bold\"></div><input id=\"slots\" type=\"number\" placeholder=\"टोटल स्लॉट्स (उदा: 48)\" value=\"48\" class=\"p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white\"><button onclick=\"createMatch()\" class=\"md:col-span-2 bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-lg text-xs transition\">मैच पब्लिश करें</button></div></div><div class=\"space-y-3\"><h2 class=\"text-sm font-bold text-orange-400\">📊 लाइव / अपकमिंग मैचेस</h2><div id=\"matchesList\" class=\"space-y-3\"></div></div></section><section id=\"secUsers\" class=\"space-y-4 hidden\"><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\"><div class=\"bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow flex justify-between items-center\"><div><p class=\"text-xs text-gray-400 font-bold\">टोटल रजिस्टर्ड खिलाड़ी</p><p id=\"totalUsersCount\" class=\"text-2xl font-black text-yellow-400 font-mono\">0</p></div><span class=\"text-3xl\">👥</span></div><div class=\"bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/30 shadow space-y-1.5\"><p class=\"text-xs font-bold text-yellow-400\">🎁 सीधे कॉइन भेजें (Reward)</p><div class=\"flex gap-1.5\"><input id=\"rewardUid\" type=\"text\" placeholder=\"FF UID\" class=\"p-1.5 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white\"><input id=\"rewardAmount\" type=\"number\" placeholder=\"₹\" class=\"p-1.5 text-xs bg-gray-800 rounded-lg border border-gray-700 w-16 text-white\"><button onclick=\"sendCoinsToUser()\" class=\"bg-yellow-500 hover:bg-yellow-600 text-black px-2.5 py-1.5 rounded-lg font-black text-xs\">भेजें</button></div></div></div><div class=\"bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3\"><div class=\"flex justify-between items-center\"><h2 class=\"text-sm font-bold text-yellow-400\">📋 सभी खिलाड़ियों की पूरी जानकारी (Full Details)</h2><span class=\"text-[10px] text-gray-400\">लाइव सिंक</span></div><div class=\"relative\"><input id=\"searchUserUid\" type=\"text\" onkeyup=\"filterUsers()\" placeholder=\"खिलाड़ी की UID, नाम या मोबाइल से खोजें...\" class=\"w-full p-2.5 pl-8 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500\"><span class=\"absolute left-2.5 top-2.5 text-gray-400 text-xs\">🔍</span></div><div id=\"usersListContainer\" class=\"space-y-3 pt-2\"><p class=\"text-gray-500 text-xs text-center py-6\">खिलाड़ी लोड हो रहे हैं...</p></div></div></section><section id=\"secDeposits\" class=\"space-y-4 hidden\"><div class=\"bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3\"><h2 class=\"text-sm font-bold text-green-400\">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2><div id=\"depositRequests\" class=\"space-y-2 text-xs min-h-[150px]\"></div></div></section><section id=\"secWithdrawals\" class=\"space-y-4 hidden\"><div class=\"bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3\"><h2 class=\"text-sm font-bold text-yellow-400\">💸 विड्रॉल रिक्वेस्ट्स (पैसे भेजना है)</h2><div id=\"withdrawRequests\" class=\"space-y-2 text-xs min-h-[150px]\"></div></div></section><section id=\"secPlayRedeem\" class=\"space-y-4 hidden\"><div class=\"bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3\"><h2 class=\"text-sm font-bold text-green-400\">▶ Play Redeem Code रिक्वेस्ट्स (यूजर को कोड भेजना है)</h2><div id=\"playRedeemRequests\" class=\"space-y-2 text-xs min-h-[150px]\"></div></div></section><section id=\"secRedeemReward\" class=\"space-y-4 hidden\"><div class=\"bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3\"><h2 class=\"text-sm font-bold text-yellow-400\">🎁 Redeem Reward बनाएँ (YouTube के लिए)</h2><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\"><input id=\"rewardCodeAmount\" type=\"number\" placeholder=\"अमाउंट (₹)\" class=\"p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white\"><input id=\"rewardCodeInput\" type=\"text\" placeholder=\"कोड डालें (उदा: MX100)\" class=\"p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-yellow-400 font-mono uppercase\"></div><button onclick=\"createRedeemReward()\" class=\"w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-lg text-xs transition\">कोड पब्लिश करें</button><div id=\"redeemRewardsList\" class=\"space-y-2 text-xs pt-2\"></div></div></section></div><div id=\"referAlertsModal\" class=\"fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50\"><div class=\"bg-gray-900 border border-yellow-500/40 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl space-y-3\"><div class=\"flex justify-between items-center border-b border-gray-800 pb-2\"><h3 class=\"font-bold text-yellow-400 text-sm\">🔔 Refer Notifications</h3><button onclick=\"closeModal('referAlertsModal')\" class=\"text-gray-400 font-bold\">&times;</button></div><div id=\"referAlertsList\" class=\"overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800\"></div><div class=\"flex gap-2\"><button onclick=\"clearReferNotifs()\" class=\"flex-1 bg-red-950/60 text-red-400 border border-red-800/60 font-bold py-2 rounded-lg text-xs\">क्लियर करें</button><button onclick=\"closeModal('referAlertsModal')\" class=\"flex-1 bg-gray-800 text-white font-bold py-2 rounded-lg text-xs\">बंद करें</button></div></div></div><div id=\"resultModal\" class=\"fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto\"><div class=\"bg-gray-900 border border-yellow-500/40 p-5 rounded-3xl w-full max-w-sm space-y-3 shadow-2xl my-auto\"><div class=\"flex justify-between items-center border-b border-gray-800 pb-2\"><h3 class=\"font-black text-yellow-400 text-sm\">📊 मैच रिजल्ट व Kills दर्ज करें</h3><button onclick=\"closeModal('resultModal')\" class=\"text-gray-400 font-bold\">&times;</button></div><div id=\"resultPlayersList\" class=\"max-h-60 overflow-y-auto space-y-2.5 pr-1 divide-y divide-gray-800/60 text-xs\"></div><button onclick=\"finalizeMatchResults()\" class=\"w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition\">कन्फर्म रिजल्ट &amp; पब्लिश लीडरबोर्ड</button></div></div><div id=\"playersModal\" class=\"fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50\"><div class=\"bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl\"><h3 class=\"font-bold text-yellow-400 mb-2 text-sm\">👥 मैच में जॉइन किए गए खिलाड़ी</h3><div id=\"playersListContent\" class=\"overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800\"></div><button onclick=\"closeModal('playersModal')\" class=\"mt-4 bg-gray-800 text-white font-bold py-2 rounded-lg text-xs\">बंद करें</button></div></div><script>const firebaseConfig = { apiKey: \"1:490438093989:web:45311a4b2cbe6f6f4b714c\", databaseURL: \"https://mx-e-sports-82b3d-default-rtdb.firebaseio.com\", projectId: \"mx-e-sports-82b3d\" }; firebase.initializeApp(firebaseConfig); const db = firebase.database(); let allUsersData = []; let allDepositsData = {}; let allWithdrawalsData = {}; let allParticipantsData = {}; let allResultsData = {}; let allReferNotifs = {}; let activeResultMatchId = null; function checkPin() { const pin = document.getElementById('adminPin').value; if(pin === \"1234\") { document.getElementById('lockScreen').classList.add('hidden'); document.getElementById('mainDashboard').classList.remove('hidden'); loadNoticeAndVideo(); togglePerKillInput(); initLedgerListeners(); } else { alert(\"गलत पिन!\"); } } function initLedgerListeners() { db.ref('deposits').on('value', s => allDepositsData = s.val() || {}); db.ref('withdrawals').on('value', s => allWithdrawalsData = s.val() || {}); db.ref('participants').on('value', s => allParticipantsData = s.val() || {}); db.ref('match_results').on('value', s => allResultsData = s.val() || {}); listenPlayRedeem(); listenRedeemRewards(); listenReferNotifs(); } function togglePerKillInput() { const mode = document.getElementById('gameMode').value; const hasPerKill = (mode === 'SURVIVOR' || mode === 'BERMUDA' || mode === 'FREE MATCH'); const box = document.getElementById('perKillBox'); if(hasPerKill) box.classList.remove('hidden'); else box.classList.add('hidden'); } function loadNoticeAndVideo() { db.ref('notice').once('value', s => { if(s.val()) document.getElementById('noticeInput').value = s.val(); }); db.ref('videoLink').once('value', s => { if(s.val()) document.getElementById('videoLinkInput').value = s.val(); }); } function updateNotice() { const text = document.getElementById('noticeInput').value.trim(); db.ref('notice').set(text).then(() => alert('✅ ऐप का नोटिस लाइव अपडेट हो गया!')); } function updateVideoLink() { const link = document.getElementById('videoLinkInput').value.trim(); db.ref('videoLink').set(link).then(() => alert('✅ वीडियो लिंक सेव हो गया!')); } function switchAdminTab(tab) { ['secMatches', 'secUsers', 'secDeposits', 'secWithdrawals', 'secPlayRedeem', 'secRedeemReward'].forEach(id => document.getElementById(id).classList.add('hidden')); ['btnTabMatches', 'btnTabUsers', 'btnTabDeposits', 'btnTabWithdrawals', 'btnTabPlayRedeem', 'btnTabRedeemReward'].forEach(id => { document.getElementById(id).className = \"flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold\"; }); if(tab === 'matches') { document.getElementById('secMatches').classList.remove('hidden'); document.getElementById('btnTabMatches').className = \"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\"; } else if(tab === 'users') { document.getElementById('secUsers').classList.remove('hidden'); document.getElementById('btnTabUsers').className = \"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\"; } else if(tab === 'deposits') { document.getElementById('secDeposits').classList.remove('hidden'); document.getElementById('btnTabDeposits').className = \"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\"; } else if(tab === 'withdrawals') { document.getElementById('secWithdrawals').classList.remove('hidden'); document.getElementById('btnTabWithdrawals').className = \"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\"; } else if(tab === 'playRedeem') { document.getElementById('secPlayRedeem').classList.remove('hidden'); document.getElementById('btnTabPlayRedeem').className = \"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\"; } else if(tab === 'redeemReward') { document.getElementById('secRedeemReward').classList.remove('hidden'); document.getElementById('btnTabRedeemReward').className = \"flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold\"; } } function createMatch() { const mode = document.getElementById('gameMode').value; const title = document.getElementById('title').value.trim(); const time = document.getElementById('time').value.trim(); const fee = document.getElementById('fee').value.trim(); const prize = document.getElementById('prize').value.trim(); const slots = document.getElementById('slots').value || 48; const hasPerKill = (mode === 'SURVIVOR' || mode === 'BERMUDA' || mode === 'FREE MATCH'); const perKill = hasPerKill ? (Number(document.getElementById('perKill').value) || 0) : 0; if(!title || !time || !fee || !prize) return alert('सभी डिटेल्स भरें!'); const matchRef = db.ref('matches').push(); matchRef.set({ id: matchRef.key, mode, title, time, fee, prize, perKill, slots, roomId: \"\", roomPass: \"\", status: \"upcoming\", winner: \"\" }).then(() => { alert(`✅ [${mode}] मैच पब्लिश हो गया!`); document.getElementById('title').value = ''; document.getElementById('perKill').value = ''; }); } db.ref('matches').on('value', snapshot => { const container = document.getElementById('matchesList'); container.innerHTML = ''; const data = snapshot.val(); if(!data) return container.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-6\">कोई मैच नहीं है।</p>'; for(let id in data) { const m = data[id]; db.ref('participants/' + id).once('value', pSnap => { const joinedCount = pSnap.numChildren(); container.innerHTML += `<div class=\"bg-gray-900 p-4 rounded-xl border border-gray-800 shadow space-y-3\"><div class=\"flex justify-between items-start\"><div><div class=\"flex items-center gap-2\"><h3 class=\"font-bold text-yellow-400 text-sm\">${m.title}</h3><span class=\"text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold\">${m.mode || 'BERMUDA'}</span></div><p class=\"text-xs text-gray-400\">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize} ${m.perKill ? '| Kill: ₹' + m.perKill : ''}</p><p class=\"text-xs text-blue-400 font-semibold mt-0.5\">स्लॉट्स: ${joinedCount}/${m.slots} जॉइंड | स्टेटस: <b class=\"${m.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}\">${m.status}</b></p></div><button onclick=\"deleteMatch('${id}')\" class=\"text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40\">डिलीट</button></div><div class=\"grid grid-cols-2 md:grid-cols-4 gap-2\"><input id=\"rid_${id}\" type=\"text\" placeholder=\"Room ID\" value=\"${m.roomId || ''}\" class=\"p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white\"><input id=\"rpass_${id}\" type=\"text\" placeholder=\"Pass\" value=\"${m.roomPass || ''}\" class=\"p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white\"><button onclick=\"updateRoom('${id}')\" class=\"bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold text-white\">ID/Pass भेजें</button><button onclick=\"viewPlayers('${id}')\" class=\"bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold text-white\">खिलाड़ी देखें (${joinedCount})</button></div><div class=\"flex flex-col sm:flex-row gap-2 items-center pt-2 border-t border-gray-800\"><input id=\"win_${id}\" type=\"text\" placeholder=\"Booyah विनर का IGN\" value=\"${m.winner || ''}\" class=\"flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white w-full sm:w-auto\"><button onclick=\"openResultModal('${id}')\" class=\"bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xs px-3 py-1.5 rounded-lg font-black w-full sm:w-auto\">📊 रिजल्ट व Kills दर्ज करें</button></div></div>`; }); } }); function updateRoom(id) { const roomId = document.getElementById('rid_' + id).value; const roomPass = document.getElementById('rpass_' + id).value; db.ref('matches/' + id).update({ roomId, roomPass }).then(() => alert('Room ID और Pass अपडेट हो गया!')); } function deleteMatch(id) { if(confirm('क्या सच में यह मैच हटाना है?')) { db.ref('matches/' + id).remove(); db.ref('participants/' + id).remove(); db.ref('match_results/' + id).remove(); } } function openResultModal(matchId) { activeResultMatchId = matchId; const list = document.getElementById('resultPlayersList'); list.innerHTML = ''; db.ref('participants/' + matchId).once('value', snap => { const data = snap.val(); if(!data) { list.innerHTML = '<p class=\"text-gray-400 py-4 text-center\">इस मैच में कोई खिलाड़ी नहीं है।</p>'; } else { for(let key in data) { const p = data[key]; list.innerHTML += `<div class=\"pt-2 space-y-1\"><p class=\"font-bold text-white text-xs\">${p.p1Name} <span class=\"text-yellow-400 font-mono text-[10px]\">(${p.p1Uid})</span></p><div class=\"grid grid-cols-2 gap-2\"><input id=\"kills_${p.p1Uid}\" type=\"number\" placeholder=\"Kills\" value=\"0\" class=\"p-1 text-xs bg-gray-800 rounded border border-gray-700 text-white\"><input id=\"won_${p.p1Uid}\" type=\"number\" placeholder=\"Coins Won (₹)\" value=\"0\" class=\"p-1 text-xs bg-gray-800 rounded border border-gray-700 text-green-400 font-bold\"></div></div>`; } } openModal('resultModal'); }); } function finalizeMatchResults() { if(!activeResultMatchId) return; const winnerName = document.getElementById('win_' + activeResultMatchId)?.value || 'Declared'; db.ref('participants/' + activeResultMatchId).once('value', snap => { const data = snap.val(); if(!data) return; const resultsData = {}; for(let key in data) { const p = data[key]; const uid = p.p1Uid; const kills = Number(document.getElementById('kills_' + uid)?.value || 0); const won = Number(document.getElementById('won_' + uid)?.value || 0); resultsData[uid] = { name: p.p1Name, uid: uid, kills: kills, won: won }; if(won > 0) { db.ref('users/' + uid).once('value', uSnap => { const curBal = Number(uSnap.val()?.balance || 0); db.ref('users/' + uid).update({ balance: curBal + won }); }); } } db.ref('match_results/' + activeResultMatchId).set(resultsData); db.ref('matches/' + activeResultMatchId).update({ status: 'completed', winner: winnerName }).then(() => { alert('✅ मैच रिजल्ट व लीडरबोर्ड पब्लिश हो गया और विनर कॉइन्स जुड़ गए!'); closeModal('resultModal'); }); }); } function viewPlayers(id) { db.ref('participants/' + id).once('value', snap => { const list = document.getElementById('playersListContent'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<p class=\"text-gray-400 py-4 text-center\">अभी तक किसी ने जॉइन नहीं किया।</p>'; } else { let i = 1; for(let key in data) { const p = data[key]; list.innerHTML += `<div class=\"py-2 flex justify-between items-center\"><div><p class=\"font-bold text-white\">${i++}. ${p.p1Name} <span class=\"text-yellow-400 font-mono\">(${p.p1Uid})</span></p>${p.p2Name ? `<p class=\"text-[10px] text-gray-400 pl-2\">↳ Partner: ${p.p2Name} (${p.p2Uid})</p>` : ''}</div><button onclick=\"quickReward('${p.p1Uid}')\" class=\"bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded text-[10px] font-bold\">प्राइज दें</button></div>`; } } openModal('playersModal'); }); } db.ref('users').on('value', snap => { allUsersData = []; snap.forEach(child => allUsersData.push(child.val())); document.getElementById('totalUsersCount').innerText = allUsersData.length; renderUsers(allUsersData); }); function renderUsers(users) { const container = document.getElementById('usersListContainer'); container.innerHTML = ''; if(!users || users.length === 0) return container.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-6\">कोई खिलाड़ी नहीं मिला।</p>'; users.forEach(u => { const uid = u.uid; const isBlocked = (u.isBlocked === true); let totalDeposited = 0; for(let k in allDepositsData) { if(allDepositsData[k].uid === uid && allDepositsData[k].status === 'approved') { totalDeposited += Number(allDepositsData[k].amount || 0); } } let totalWithdrawn = 0; for(let k in allWithdrawalsData) { if(allWithdrawalsData[k].uid === uid && allWithdrawalsData[k].status === 'paid') { totalWithdrawn += Number(allWithdrawalsData[k].amount || 0); } } let totalMatches = 0; for(let mId in allParticipantsData) { const pList = allParticipantsData[mId]; for(let pKey in pList) { if(pList[pKey].p1Uid === uid || pList[pKey].p2Uid === uid) totalMatches++; } } container.innerHTML += `<div class=\"bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-xl space-y-3\"><div class=\"flex justify-between items-start border-b border-gray-800 pb-2\"><div><div class=\"flex items-center gap-2\"><h3 class=\"font-black text-white text-sm\">${u.name}</h3><span class=\"text-[9px] px-2 py-0.5 rounded font-bold ${isBlocked ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'}\">${isBlocked ? '🚫 Blocked' : '🟢 Active'}</span></div><p class=\"text-xs text-gray-400 font-mono mt-0.5\">Free Fire UID: <b class=\"text-yellow-400 font-bold select-all\">${u.uid}</b></p></div><div class=\"text-right\"><p class=\"text-[10px] text-gray-400\">मौजूदा बैलेंस</p><p class=\"text-sm font-black text-green-400 font-mono\">₹${u.balance || 0}</p></div></div><div class=\"grid grid-cols-2 gap-2 text-[11px] bg-gray-950 p-2.5 rounded-xl border border-gray-800\"><div><span class=\"text-gray-400\">📱 फोन नंबर:</span><p class=\"font-bold text-white\">${u.phone || 'N/A'}</p></div><div><span class=\"text-gray-400\">🔑 पासवर्ड:</span><p class=\"font-mono font-bold text-red-400 select-all\">${u.pass || 'N/A'}</p></div></div><div class=\"grid grid-cols-3 gap-1.5 text-center text-[10px] bg-gray-950 p-2 rounded-xl border border-gray-800\"><div><p class=\"text-gray-400\">कुल ऐड किए (Deposits)</p><p class=\"font-black text-blue-400 font-mono text-xs\">₹${totalDeposited}</p></div><div><p class=\"text-gray-400\">कुल निकाले (Withdraws)</p><p class=\"font-black text-yellow-400 font-mono text-xs\">₹${totalWithdrawn}</p></div><div><p class=\"text-gray-400\">कुल मैच खेले</p><p class=\"font-black text-orange-400 text-xs\">${totalMatches} Match</p></div></div><div class=\"flex gap-2 pt-1\"><button onclick=\"quickReward('${u.uid}')\" class=\"flex-1 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 py-1.5 rounded-lg text-xs font-bold transition\">🎁 +कॉइन भेजें</button><button onclick=\"toggleBlockUser('${u.uid}', ${isBlocked})\" class=\"flex-1 ${isBlocked ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white py-1.5 rounded-lg text-xs font-bold transition\">${isBlocked ? '✅ Unblock करें' : '🚫 Block करें'}</button></div></div>`; }); } function filterUsers() { const query = document.getElementById('searchUserUid').value.toLowerCase().trim(); const filtered = allUsersData.filter(u => (u.uid && u.uid.toLowerCase().includes(query)) || (u.name && u.name.toLowerCase().includes(query)) || (u.phone && u.phone.includes(query))); renderUsers(filtered); } function toggleBlockUser(uid, currentStatus) { const newStatus = !currentStatus; const actionText = newStatus ? 'ब्लॉक' : 'अनब्लॉक'; if(confirm(`खिलाड़ी UID: ${uid} को ${actionText} करना चाहते हैं?`)) { db.ref('users/' + uid).update({ isBlocked: newStatus }).then(() => alert(`खिलाड़ी ${actionText} हो गया!`)); } } function sendCoinsToUser() { const uid = document.getElementById('rewardUid').value.trim(); const amount = Number(document.getElementById('rewardAmount').value); if(!uid || !amount || amount <= 0) return alert('UID और सही अमाउंट डालें!'); db.ref('users/' + uid).once('value', snap => { if(!snap.exists()) return alert('यह UID नहीं मिली!'); const cur = Number(snap.val().balance || 0); db.ref('users/' + uid).update({ balance: cur + amount }).then(() => { alert(`✅ UID: ${uid} को ₹${amount} भेज दिए गए! नया बैलेंस: ₹${cur + amount}`); document.getElementById('rewardUid').value = ''; document.getElementById('rewardAmount').value = ''; }); }); } function quickReward(uid) { switchAdminTab('users'); document.getElementById('rewardUid').value = uid; window.scrollTo({ top: 0, behavior: 'smooth' }); } db.ref('deposits').on('value', snap => { const box = document.getElementById('depositRequests'); box.innerHTML = ''; const data = snap.val(); if(!data) return box.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-6\">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>'; for(let id in data) { const req = data[id]; if(req.status === 'pending') { box.innerHTML += `<div class=\"bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700\"><div><p class=\"font-bold text-green-400\">₹${req.amount} | UTR: ${req.utr}</p><p class=\"text-[11px] text-gray-300\">${req.userName} (UID: ${req.uid})</p></div><button onclick=\"approveDeposit('${id}', '${req.uid}', ${req.amount})\" class=\"bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition\">Approve (+बैलेंस)</button></div>`; } } }); function approveDeposit(id, uid, amount) { db.ref('users/' + uid).once('value', snap => { const cur = Number(snap.val()?.balance || 0); db.ref('users/' + uid).update({ balance: cur + Number(amount) }); db.ref('deposits/' + id).update({ status: 'approved' }).then(() => alert(`✅ ₹${amount} जुड़ गए!`)); }); } db.ref('withdrawals').on('value', snap => { const box = document.getElementById('withdrawRequests'); box.innerHTML = ''; const data = snap.val(); if(!data) return box.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-6\">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>'; for(let id in data) { const req = data[id]; if(req.status === 'pending') { box.innerHTML += `<div class=\"bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700\"><div><p class=\"font-bold text-yellow-400\">₹${req.amount} भेजना है</p><p class=\"text-[11px] text-white font-mono bg-gray-900 px-1.5 py-0.5 rounded select-all font-bold\">UPI: ${req.upi}</p><p class=\"text-[10px] text-gray-400\">${req.userName} (UID: ${req.uid})</p></div><button onclick=\"approveWithdraw('${id}', '${req.upi}', ${req.amount})\" class=\"bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1.5 rounded-lg text-xs font-black transition\">Paid (भेज दिया)</button></div>`; } } }); function approveWithdraw(id, upi, amount) { if(confirm(`क्या आपने UPI (${upi}) पर ₹${amount} भेज दिए हैं?`)) { db.ref('withdrawals/' + id).update({ status: 'paid' }).then(() => alert('✅ Paid मार्क हो गया!')); } } function listenPlayRedeem() { db.ref('play_redeem_requests').on('value', snap => { const box = document.getElementById('playRedeemRequests'); box.innerHTML = ''; const data = snap.val(); if(!data) return box.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-6\">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>'; let count = 0; for(let id in data) { const req = data[id]; if(req.status === 'pending') { count++; box.innerHTML += `<div class=\"bg-gray-800 p-2.5 rounded-lg space-y-2 border border-gray-700\"><div><p class=\"font-bold text-green-400\">₹${req.amount} का Google Play Redeem Code</p><p class=\"text-[11px] text-gray-300\">${req.userName} (UID: ${req.uid})</p></div><div class=\"flex gap-2\"><input id=\"playcode_${id}\" type=\"text\" placeholder=\"Google Play Code डालें\" class=\"flex-1 p-1.5 text-xs bg-gray-900 rounded border border-gray-700 text-white font-mono\"><button onclick=\"sendPlayRedeemCode('${id}')\" class=\"bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition\">Send Code</button></div></div>`; } } if(count === 0) box.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-6\">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>'; }); } function sendPlayRedeemCode(id) { const code = document.getElementById('playcode_' + id)?.value.trim(); if(!code) return alert('कृपया Google Play Redeem Code डालें!'); db.ref('play_redeem_requests/' + id).update({ code: code, status: 'sent', sentAt: Date.now() }).then(() => alert('✅ कोड यूजर के पासबुक में भेज दिया गया!')); } function createRedeemReward() { const amount = Number(document.getElementById('rewardCodeAmount').value); const code = document.getElementById('rewardCodeInput').value.trim().toUpperCase(); if(!amount || amount <= 0 || !code) return alert('सही अमाउंट और कोड भरें!'); db.ref('redeem_codes/' + code).set({ code: code, amount: amount, active: true, usedCount: 0, createdAt: Date.now() }).then(() => { alert(`✅ कोड ${code} (₹${amount}) पब्लिश हो गया!`); document.getElementById('rewardCodeAmount').value = ''; document.getElementById('rewardCodeInput').value = ''; }); } function listenRedeemRewards() { db.ref('redeem_codes').on('value', snap => { const box = document.getElementById('redeemRewardsList'); box.innerHTML = ''; const data = snap.val(); if(!data) return box.innerHTML = '<p class=\"text-gray-500 text-xs text-center py-4\">अभी कोई कोड नहीं है।</p>'; for(let codeKey in data) { const item = data[codeKey]; const amt = (typeof item === 'object') ? item.amount : item; const used = (typeof item === 'object') ? (item.usedCount || 0) : 0; box.innerHTML += `<div class=\"bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700\"><div><p class=\"font-mono font-bold text-yellow-400 select-all\">${codeKey} <span class=\"text-green-400\">(₹${amt})</span></p><p class=\"text-[10px] text-gray-400\">Used: ${used}</p></div><button onclick=\"deleteRewardCode(decodeURIComponent('${encodeURIComponent(codeKey)}'))\" class=\"text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40\">डिलीट</button></div>`; } }); } function deleteRewardCode(code) { if(confirm(`क्या कोड ${code} को डिलीट करना है?`)) { db.ref('redeem_codes/' + code).remove(); } } function listenReferNotifs() { db.ref('referral_notifications').on('value', snap => { allReferNotifs = snap.val() || {}; const list = document.getElementById('referAlertsList'); const badge = document.getElementById('referBadgeCount'); list.innerHTML = ''; const keys = Object.keys(allReferNotifs).reverse(); if(keys.length === 0) { badge.classList.add('hidden'); list.innerHTML = '<p class=\"text-gray-500 text-center py-6\">कोई रेफरल नोटिफिकेशन नहीं है।</p>'; return; } let unread = 0; keys.forEach(k => { const n = allReferNotifs[k]; if(!n.read) unread++; list.innerHTML += `<div class=\"py-2 flex justify-between items-center\"><div><p class=\"font-bold text-white\">${n.referrerName} (${n.referrerUid}) ने रेफर किया</p><p class=\"text-[10px] text-gray-400\">नया यूजर: ${n.newUserName} (${n.newUserUid})</p></div><span class=\"text-green-400 font-bold\">+₹${n.bonus || 5}</span></div>`; }); if(unread > 0) { badge.innerText = unread; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }); } function openReferAlertsModal() { openModal('referAlertsModal'); for(let k in allReferNotifs) { if(!allReferNotifs[k].read) db.ref('referral_notifications/' + k).update({ read: true }); } } function clearReferNotifs() { if(confirm('सभी Refer Notifications डिलीट करना चाहते हैं?')) { db.ref('referral_notifications').remove(); } } function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); } function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }</script></body></html>"}
+<!-- Lock Screen -->
+<div id="lockScreen" class="fixed inset-0 bg-black flex items-center justify-center p-4 z-50">
+    <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-xs text-center space-y-4 shadow-2xl">
+        <h2 class="text-xl font-bold text-yellow-500">🔒 Admin Access</h2>
+        <p class="text-xs text-gray-400">एडमिन पिन दर्ज करें (Default: 1234)</p>
+        <input id="adminPin" type="password" placeholder="Enter PIN" class="w-full p-2.5 rounded bg-gray-800 border border-gray-700 text-center tracking-widest text-lg focus:outline-none focus:border-yellow-500 text-white">
+        <button onclick="checkPin()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded text-sm transition">लॉगिन करें</button>
+    </div>
+</div>
+
+<!-- Main Dashboard -->
+<div id="mainDashboard" class="max-w-4xl mx-auto hidden space-y-4">
+    
+    <header class="flex justify-between items-center bg-gray-900 p-3.5 rounded-2xl border border-gray-800 shadow-xl">
+        <div>
+            <h1 class="text-xl font-black text-yellow-500 tracking-wider">🔥 MX E-SPORTS ADMIN</h1>
+            <p class="text-[11px] text-gray-400">मास्टर कंट्रोल पैनल</p>
+        </div>
+        <button onclick="location.reload()" class="bg-red-950/60 text-red-400 border border-red-800/60 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-900 transition">लॉगआउट</button>
+    </header>
+
+    <!-- 4 MAIN TABS -->
+    <nav class="flex bg-gray-900 p-1.5 rounded-2xl border border-gray-800 text-xs font-bold gap-1 shadow-lg overflow-x-auto">
+        <button onclick="switchAdminTab('matches')" id="btnTabMatches" class="flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold">
+            🎮 1. टूर्नामेंट्स
+        </button>
+        <button onclick="switchAdminTab('users')" id="btnTabUsers" class="flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold">
+            👥 2. खिलाड़ी & पूरा हिसाब
+        </button>
+        <button onclick="switchAdminTab('deposits')" id="btnTabDeposits" class="flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold">
+            ➕ 3. डिपॉजिट
+        </button>
+        <button onclick="switchAdminTab('withdrawals')" id="btnTabWithdrawals" class="flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold">
+            💸 4. विड्रॉल
+        </button>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- MENU 1: CREATE TOURNAMENT                  -->
+    <!-- ========================================== -->
+    <section id="secMatches" class="space-y-4">
+        <!-- Notice & Video Link -->
+        <div class="bg-gray-900 p-4 rounded-2xl border border-yellow-500/30 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-yellow-400">📢 ऐप नोटिस और वीडियो लिंक ब्रॉडकास्ट</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-1.5">
+                    <p class="text-[11px] text-gray-400">ऐप पर दौड़ने वाला नोटिस:</p>
+                    <div class="flex gap-1.5">
+                        <input id="noticeInput" type="text" placeholder="उदा: आज शाम 8 बजे फ्री टूर्नामेंट..." class="p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white">
+                        <button onclick="updateNotice()" class="bg-yellow-500 text-black px-3 py-1.5 rounded-lg font-bold text-xs">अपडेट</button>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <p class="text-[11px] text-gray-400">यूट्यूब वीडियो लिंक:</p>
+                    <div class="flex gap-1.5">
+                        <input id="videoLinkInput" type="text" placeholder="https://youtube.com/..." class="p-2 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white">
+                        <button onclick="updateVideoLink()" class="bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">सेव</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Match Form -->
+        <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-orange-400">➕ नया टूर्नामेंट बनाएँ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">गेम मोड चुनें:</label>
+                    <select id="gameMode" onchange="togglePerKillInput()" class="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-yellow-400 font-bold focus:outline-none">
+                        <option value="CLASH SQUAD 1VS1">CLASH SQUAD 1VS1 (No Per Kill)</option>
+                        <option value="CLASH SQUAD 2VS2">CLASH SQUAD 2VS2 (No Per Kill)</option>
+                        <option value="SURVIVOR">SURVIVOR (With Per Kill)</option>
+                        <option value="BERMUDA">BERMUDA (With Per Kill)</option>
+                        <option value="LONE WOLF">LONE WOLF (No Per Kill)</option>
+                        <option value="FREE MATCH">FREE MATCH (₹0 Entry + Per Kill)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">मैच का नाम:</label>
+                    <input id="title" type="text" placeholder="उदा: Bermuda Solo Battle #1" class="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                </div>
+                <input id="time" type="text" placeholder="तारीख और समय (उदा: Today 8:00 PM)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="fee" type="number" placeholder="एंट्री फीस प्रति खिलाड़ी (₹)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <input id="prize" type="number" placeholder="प्राइज पूल (₹)" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                
+                <div id="perKillBox">
+                    <input id="perKill" type="number" placeholder="प्रति किल प्राइज (Per Kill ₹)" class="w-full p-2.5 rounded-lg bg-gray-800 border border-orange-500/40 text-xs text-orange-400 font-bold">
+                </div>
+
+                <input id="slots" type="number" placeholder="टोटल स्लॉट्स (उदा: 48)" value="48" class="p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white">
+                <button onclick="createMatch()" class="md:col-span-2 bg-yellow-500 hover:bg-yellow-600 text-black font-black py-2.5 rounded-lg text-xs transition">मैच पब्लिश करें</button>
+            </div>
+        </div>
+
+        <!-- Matches List -->
+        <div class="space-y-3">
+            <h2 class="text-sm font-bold text-orange-400">📊 लाइव / अपकमिंग मैचेस</h2>
+            <div id="matchesList" class="space-y-3"></div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MENU 2: USERS & FULL DETAILS LEDGER        -->
+    <!-- ========================================== -->
+    <section id="secUsers" class="space-y-4 hidden">
+        <!-- Stats & Quick Coin Tool -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-gray-400 font-bold">टोटल रजिस्टर्ड खिलाड़ी</p>
+                    <p id="totalUsersCount" class="text-2xl font-black text-yellow-400 font-mono">0</p>
+                </div>
+                <span class="text-3xl">👥</span>
+            </div>
+            <div class="bg-gray-900 p-3.5 rounded-2xl border border-yellow-500/30 shadow space-y-1.5">
+                <p class="text-xs font-bold text-yellow-400">🎁 सीधे कॉइन भेजें (Reward)</p>
+                <div class="flex gap-1.5">
+                    <input id="rewardUid" type="text" placeholder="FF UID" class="p-1.5 text-xs bg-gray-800 rounded-lg border border-gray-700 flex-1 text-white">
+                    <input id="rewardAmount" type="number" placeholder="₹" class="p-1.5 text-xs bg-gray-800 rounded-lg border border-gray-700 w-16 text-white">
+                    <button onclick="sendCoinsToUser()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-2.5 py-1.5 rounded-lg font-black text-xs">भेजें</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Search & Full Cards List -->
+        <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
+            <div class="flex justify-between items-center">
+                <h2 class="text-sm font-bold text-yellow-400">📋 सभी खिलाड़ियों की पूरी जानकारी (Full Details)</h2>
+                <span class="text-[10px] text-gray-400">लाइव सिंक</span>
+            </div>
+            
+            <div class="relative">
+                <input id="searchUserUid" type="text" onkeyup="filterUsers()" placeholder="खिलाड़ी की UID, नाम या मोबाइल से खोजें..." class="w-full p-2.5 pl-8 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-yellow-500">
+                <span class="absolute left-2.5 top-2.5 text-gray-400 text-xs">🔍</span>
+            </div>
+
+            <!-- ALL USERS CONTAINER WITH COMPLETE DETAILS DIRECTLY ON CARDS -->
+            <div id="usersListContainer" class="space-y-3 pt-2">
+                <p class="text-gray-500 text-xs text-center py-6">खिलाड़ी लोड हो रहे हैं...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MENU 3: DEPOSITS -->
+    <section id="secDeposits" class="space-y-4 hidden">
+        <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-green-400">➕ ऐड मनी रिक्वेस्ट्स (Deposits)</h2>
+            <div id="depositRequests" class="space-y-2 text-xs min-h-[150px]"></div>
+        </div>
+    </section>
+
+    <!-- MENU 4: WITHDRAWALS -->
+    <section id="secWithdrawals" class="space-y-4 hidden">
+        <div class="bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-xl space-y-3">
+            <h2 class="text-sm font-bold text-yellow-400">💸 विड्रॉल रिक्वेस्ट्स (पैसे भेजना है)</h2>
+            <div id="withdrawRequests" class="space-y-2 text-xs min-h-[150px]"></div>
+        </div>
+    </section>
+</div>
+
+<!-- MODAL: ADD MATCH RESULT -->
+<div id="resultModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-gray-900 border border-yellow-500/40 p-5 rounded-3xl w-full max-w-sm space-y-3 shadow-2xl my-auto">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+            <h3 class="font-black text-yellow-400 text-sm">📊 मैच रिजल्ट व Kills दर्ज करें</h3>
+            <button onclick="closeModal('resultModal')" class="text-gray-400 font-bold">&times;</button>
+        </div>
+        <div id="resultPlayersList" class="max-h-60 overflow-y-auto space-y-2.5 pr-1 divide-y divide-gray-800/60 text-xs"></div>
+        <button onclick="finalizeMatchResults()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-black py-2.5 rounded-xl text-xs shadow-lg transition">
+            कन्फर्म रिजल्ट & पब्लिश लीडरबोर्ड
+        </button>
+    </div>
+</div>
+
+<!-- Players Modal -->
+<div id="playersModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
+    <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
+        <h3 class="font-bold text-yellow-400 mb-2 text-sm">👥 मैच में जॉइन किए गए खिलाड़ी</h3>
+        <div id="playersListContent" class="overflow-y-auto flex-1 space-y-2 text-xs divide-y divide-gray-800"></div>
+        <button onclick="closeModal('playersModal')" class="mt-4 bg-gray-800 text-white font-bold py-2 rounded-lg text-xs">बंद करें</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "1:490438093989:web:45311a4b2cbe6f6f4b714c",
+        databaseURL: "https://mx-e-sports-82b3d-default-rtdb.firebaseio.com",
+        projectId: "mx-e-sports-82b3d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let allUsersData = [];
+    let allDepositsData = {};
+    let allWithdrawalsData = {};
+    let allParticipantsData = {};
+    let allResultsData = {};
+    let activeResultMatchId = null;
+
+    function checkPin() {
+        const pin = document.getElementById('adminPin').value;
+        if(pin === "1234") {
+            document.getElementById('lockScreen').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            loadNoticeAndVideo();
+            togglePerKillInput();
+            initLedgerListeners();
+        } else {
+            alert("गलत पिन!");
+        }
+    }
+
+    function initLedgerListeners() {
+        db.ref('deposits').on('value', s => allDepositsData = s.val() || {});
+        db.ref('withdrawals').on('value', s => allWithdrawalsData = s.val() || {});
+        db.ref('participants').on('value', s => allParticipantsData = s.val() || {});
+        db.ref('match_results').on('value', s => allResultsData = s.val() || {});
+    }
+
+    function togglePerKillInput() {
+        const mode = document.getElementById('gameMode').value;
+        const hasPerKill = (mode === 'SURVIVOR' || mode === 'BERMUDA' || mode === 'FREE MATCH');
+        const box = document.getElementById('perKillBox');
+        if(hasPerKill) box.classList.remove('hidden');
+        else box.classList.add('hidden');
+    }
+
+    function loadNoticeAndVideo() {
+        db.ref('notice').once('value', s => { if(s.val()) document.getElementById('noticeInput').value = s.val(); });
+        db.ref('videoLink').once('value', s => { if(s.val()) document.getElementById('videoLinkInput').value = s.val(); });
+    }
+
+    function updateNotice() {
+        const text = document.getElementById('noticeInput').value.trim();
+        db.ref('notice').set(text).then(() => alert('✅ ऐप का नोटिस लाइव अपडेट हो गया!'));
+    }
+
+    function updateVideoLink() {
+        const link = document.getElementById('videoLinkInput').value.trim();
+        db.ref('videoLink').set(link).then(() => alert('✅ वीडियो लिंक सेव हो गया!'));
+    }
+
+    function switchAdminTab(tab) {
+        ['secMatches', 'secUsers', 'secDeposits', 'secWithdrawals'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        ['btnTabMatches', 'btnTabUsers', 'btnTabDeposits', 'btnTabWithdrawals'].forEach(id => {
+            document.getElementById(id).className = "flex-1 py-2 px-2 rounded-xl text-gray-400 hover:text-white transition whitespace-nowrap font-bold";
+        });
+
+        if(tab === 'matches') {
+            document.getElementById('secMatches').classList.remove('hidden');
+            document.getElementById('btnTabMatches').className = "flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold";
+        } else if(tab === 'users') {
+            document.getElementById('secUsers').classList.remove('hidden');
+            document.getElementById('btnTabUsers').className = "flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold";
+        } else if(tab === 'deposits') {
+            document.getElementById('secDeposits').classList.remove('hidden');
+            document.getElementById('btnTabDeposits').className = "flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold";
+        } else if(tab === 'withdrawals') {
+            document.getElementById('secWithdrawals').classList.remove('hidden');
+            document.getElementById('btnTabWithdrawals').className = "flex-1 py-2 px-2 rounded-xl bg-yellow-500 text-black shadow-md transition whitespace-nowrap font-bold";
+        }
+    }
+
+    function createMatch() {
+        const mode = document.getElementById('gameMode').value;
+        const title = document.getElementById('title').value.trim();
+        const time = document.getElementById('time').value.trim();
+        const fee = document.getElementById('fee').value.trim();
+        const prize = document.getElementById('prize').value.trim();
+        const slots = document.getElementById('slots').value || 48;
+        
+        const hasPerKill = (mode === 'SURVIVOR' || mode === 'BERMUDA' || mode === 'FREE MATCH');
+        const perKill = hasPerKill ? (Number(document.getElementById('perKill').value) || 0) : 0;
+
+        if(!title || !time || !fee || !prize) return alert('सभी डिटेल्स भरें!');
+
+        const matchRef = db.ref('matches').push();
+        matchRef.set({
+            id: matchRef.key,
+            mode,
+            title, time, fee, prize, perKill, slots,
+            roomId: "", roomPass: "",
+            status: "upcoming",
+            winner: ""
+        }).then(() => {
+            alert(`✅ [${mode}] मैच पब्लिश हो गया!`);
+            document.getElementById('title').value = '';
+            document.getElementById('perKill').value = '';
+        });
+    }
+
+    db.ref('matches').on('value', snapshot => {
+        const container = document.getElementById('matchesList');
+        container.innerHTML = '';
+        const data = snapshot.val();
+        if(!data) return container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">कोई मैच नहीं है।</p>';
+
+        for(let id in data) {
+            const m = data[id];
+            db.ref('participants/' + id).once('value', pSnap => {
+                const joinedCount = pSnap.numChildren();
+                container.innerHTML += `
+                    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-yellow-400 text-sm">${m.title}</h3>
+                                    <span class="text-[9px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded font-bold">${m.mode || 'BERMUDA'}</span>
+                                </div>
+                                <p class="text-xs text-gray-400">समय: ${m.time} | फीस: ₹${m.fee} | प्राइज: ₹${m.prize} ${m.perKill ? '| Kill: ₹' + m.perKill : ''}</p>
+                                <p class="text-xs text-blue-400 font-semibold mt-0.5">स्लॉट्स: ${joinedCount}/${m.slots} जॉइंड | स्टेटस: <b class="${m.status === 'completed' ? 'text-green-400' : 'text-yellow-400'}">${m.status}</b></p>
+                            </div>
+                            <button onclick="deleteMatch('${id}')" class="text-red-400 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-800/40">डिलीट</button>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <input id="rid_${id}" type="text" placeholder="Room ID" value="${m.roomId || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
+                            <input id="rpass_${id}" type="text" placeholder="Pass" value="${m.roomPass || ''}" class="p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white">
+                            <button onclick="updateRoom('${id}')" class="bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold text-white">ID/Pass भेजें</button>
+                            <button onclick="viewPlayers('${id}')" class="bg-gray-700 hover:bg-gray-600 text-xs py-1.5 rounded font-semibold text-white">खिलाड़ी देखें (${joinedCount})</button>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-2 items-center pt-2 border-t border-gray-800">
+                            <input id="win_${id}" type="text" placeholder="Booyah विनर का IGN" value="${m.winner || ''}" class="flex-1 p-1.5 text-xs bg-gray-800 rounded border border-gray-700 text-white w-full sm:w-auto">
+                            <button onclick="openResultModal('${id}')" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xs px-3 py-1.5 rounded-lg font-black w-full sm:w-auto">
+                                📊 रिजल्ट व Kills दर्ज करें
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    });
+
+    function updateRoom(id) {
+        const roomId = document.getElementById('rid_' + id).value;
+        const roomPass = document.getElementById('rpass_' + id).value;
+        db.ref('matches/' + id).update({ roomId, roomPass }).then(() => alert('Room ID और Pass अपडेट हो गया!'));
+    }
+
+    function deleteMatch(id) {
+        if(confirm('क्या सच में यह मैच हटाना है?')) {
+            db.ref('matches/' + id).remove();
+            db.ref('participants/' + id).remove();
+            db.ref('match_results/' + id).remove();
+        }
+    }
+
+    function openResultModal(matchId) {
+        activeResultMatchId = matchId;
+        const list = document.getElementById('resultPlayersList');
+        list.innerHTML = '';
+
+        db.ref('participants/' + matchId).once('value', snap => {
+            const data = snap.val();
+            if(!data) {
+                list.innerHTML = '<p class="text-gray-400 py-4 text-center">इस मैच में कोई खिलाड़ी नहीं है।</p>';
+            } else {
+                for(let key in data) {
+                    const p = data[key];
+                    list.innerHTML += `
+                        <div class="pt-2 space-y-1">
+                            <p class="font-bold text-white text-xs">${p.p1Name} <span class="text-yellow-400 font-mono text-[10px]">(${p.p1Uid})</span></p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input id="kills_${p.p1Uid}" type="number" placeholder="Kills" value="0" class="p-1 text-xs bg-gray-800 rounded border border-gray-700 text-white">
+                                <input id="won_${p.p1Uid}" type="number" placeholder="Coins Won (₹)" value="0" class="p-1 text-xs bg-gray-800 rounded border border-gray-700 text-green-400 font-bold">
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            openModal('resultModal');
+        });
+    }
+
+    function finalizeMatchResults() {
+        if(!activeResultMatchId) return;
+        const winnerName = document.getElementById('win_' + activeResultMatchId)?.value || 'Declared';
+
+        db.ref('participants/' + activeResultMatchId).once('value', snap => {
+            const data = snap.val();
+            if(!data) return;
+
+            const resultsData = {};
+            for(let key in data) {
+                const p = data[key];
+                const uid = p.p1Uid;
+                const kills = Number(document.getElementById('kills_' + uid)?.value || 0);
+                const won = Number(document.getElementById('won_' + uid)?.value || 0);
+
+                resultsData[uid] = { name: p.p1Name, uid: uid, kills: kills, won: won };
+
+                if(won > 0) {
+                    db.ref('users/' + uid).once('value', uSnap => {
+                        const curBal = Number(uSnap.val()?.balance || 0);
+                        db.ref('users/' + uid).update({ balance: curBal + won });
+                    });
+                }
+            }
+
+            db.ref('match_results/' + activeResultMatchId).set(resultsData);
+            db.ref('matches/' + activeResultMatchId).update({ status: 'completed', winner: winnerName }).then(() => {
+                alert('✅ मैच रिजल्ट व लीडरबोर्ड पब्लिश हो गया और विनर कॉइन्स जुड़ गए!');
+                closeModal('resultModal');
+            });
+        });
+    }
+
+    function viewPlayers(id) {
+        db.ref('participants/' + id).once('value', snap => {
+            const list = document.getElementById('playersListContent');
+            list.innerHTML = '';
+            const data = snap.val();
+            if(!data) {
+                list.innerHTML = '<p class="text-gray-400 py-4 text-center">अभी तक किसी ने जॉइन नहीं किया।</p>';
+            } else {
+                let i = 1;
+                for(let key in data) {
+                    const p = data[key];
+                    list.innerHTML += `
+                        <div class="py-2 flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-white">${i++}. ${p.p1Name} <span class="text-yellow-400 font-mono">(${p.p1Uid})</span></p>
+                                ${p.p2Name ? `<p class="text-[10px] text-gray-400 pl-2">↳ Partner: ${p.p2Name} (${p.p2Uid})</p>` : ''}
+                            </div>
+                            <button onclick="quickReward('${p.p1Uid}')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-2 py-1 rounded text-[10px] font-bold">प्राइज दें</button>
+                        </div>
+                    `;
+                }
+            }
+            openModal('playersModal');
+        });
+    }
+
+    // ==========================================
+    // 2. USERS: FULL DETAILS DIRECTLY ON CARDS
+    // ==========================================
+    db.ref('users').on('value', snap => {
+        allUsersData = [];
+        snap.forEach(child => allUsersData.push(child.val()));
+        document.getElementById('totalUsersCount').innerText = allUsersData.length;
+        renderUsers(allUsersData);
+    });
+
+    function renderUsers(users) {
+        const container = document.getElementById('usersListContainer');
+        container.innerHTML = '';
+        if(!users || users.length === 0) return container.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">कोई खिलाड़ी नहीं मिला।</p>';
+
+        users.forEach(u => {
+            const uid = u.uid;
+            const isBlocked = (u.isBlocked === true);
+
+            // Calculate User Financials
+            let totalDeposited = 0;
+            for(let k in allDepositsData) {
+                if(allDepositsData[k].uid === uid && allDepositsData[k].status === 'approved') {
+                    totalDeposited += Number(allDepositsData[k].amount || 0);
+                }
+            }
+
+            let totalWithdrawn = 0;
+            for(let k in allWithdrawalsData) {
+                if(allWithdrawalsData[k].uid === uid && allWithdrawalsData[k].status === 'paid') {
+                    totalWithdrawn += Number(allWithdrawalsData[k].amount || 0);
+                }
+            }
+
+            let totalMatches = 0;
+            for(let mId in allParticipantsData) {
+                const pList = allParticipantsData[mId];
+                for(let pKey in pList) {
+                    if(pList[pKey].p1Uid === uid || pList[pKey].p2Uid === uid) totalMatches++;
+                }
+            }
+
+            // COMPLETE DETAILS RENDERED DIRECTLY ON SCREEN
+            container.innerHTML += `
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-xl space-y-3">
+                    <!-- Top Info -->
+                    <div class="flex justify-between items-start border-b border-gray-800 pb-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-black text-white text-sm">${u.name}</h3>
+                                <span class="text-[9px] px-2 py-0.5 rounded font-bold ${isBlocked ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-green-950 text-green-400 border border-green-800'}">
+                                    ${isBlocked ? '🚫 Blocked' : '🟢 Active'}
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 font-mono mt-0.5">Free Fire UID: <b class="text-yellow-400 font-bold select-all">${u.uid}</b></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-gray-400">मौजूदा बैलेंस</p>
+                            <p class="text-sm font-black text-green-400 font-mono">₹${u.balance || 0}</p>
+                        </div>
+                    </div>
+
+                    <!-- Credentials & Contact -->
+                    <div class="grid grid-cols-2 gap-2 text-[11px] bg-gray-950 p-2.5 rounded-xl border border-gray-800">
+                        <div>
+                            <span class="text-gray-400">📱 फोन नंबर:</span>
+                            <p class="font-bold text-white">${u.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">🔑 पासवर्ड:</span>
+                            <p class="font-mono font-bold text-red-400 select-all">${u.pass || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <!-- Full Financial & Match Ledger (सामने ही दिखेगा) -->
+                    <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] bg-gray-950 p-2 rounded-xl border border-gray-800">
+                        <div>
+                            <p class="text-gray-400">कुल ऐड किए (Deposits)</p>
+                            <p class="font-black text-blue-400 font-mono text-xs">₹${totalDeposited}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">कुल निकाले (Withdraws)</p>
+                            <p class="font-black text-yellow-400 font-mono text-xs">₹${totalWithdrawn}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">कुल मैच खेले</p>
+                            <p class="font-black text-orange-400 text-xs">${totalMatches} Match</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="quickReward('${u.uid}')" class="flex-1 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/40 py-1.5 rounded-lg text-xs font-bold transition">
+                            🎁 +कॉइन भेजें
+                        </button>
+                        <button onclick="toggleBlockUser('${u.uid}', ${isBlocked})" class="flex-1 ${isBlocked ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white py-1.5 rounded-lg text-xs font-bold transition">
+                            ${isBlocked ? '✅ Unblock करें' : '🚫 Block करें'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function filterUsers() {
+        const query = document.getElementById('searchUserUid').value.toLowerCase().trim();
+        const filtered = allUsersData.filter(u => 
+            (u.uid && u.uid.toLowerCase().includes(query)) ||
+            (u.name && u.name.toLowerCase().includes(query)) ||
+            (u.phone && u.phone.includes(query))
+        );
+        renderUsers(filtered);
+    }
+
+    function toggleBlockUser(uid, currentStatus) {
+        const newStatus = !currentStatus;
+        const actionText = newStatus ? 'ब्लॉक' : 'अनब्लॉक';
+        if(confirm(`खिलाड़ी UID: ${uid} को ${actionText} करना चाहते हैं?`)) {
+            db.ref('users/' + uid).update({ isBlocked: newStatus }).then(() => alert(`खिलाड़ी ${actionText} हो गया!`));
+        }
+    }
+
+    function sendCoinsToUser() {
+        const uid = document.getElementById('rewardUid').value.trim();
+        const amount = Number(document.getElementById('rewardAmount').value);
+        if(!uid || !amount || amount <= 0) return alert('UID और सही अमाउंट डालें!');
+
+        db.ref('users/' + uid).once('value', snap => {
+            if(!snap.exists()) return alert('यह UID नहीं मिली!');
+            const cur = Number(snap.val().balance || 0);
+            db.ref('users/' + uid).update({ balance: cur + amount }).then(() => {
+                alert(`✅ UID: ${uid} को ₹${amount} भेज दिए गए!\nनया बैलेंस: ₹${cur + amount}`);
+                document.getElementById('rewardUid').value = '';
+                document.getElementById('rewardAmount').value = '';
+            });
+        });
+    }
+
+    function quickReward(uid) {
+        switchAdminTab('users');
+        document.getElementById('rewardUid').value = uid;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // DEPOSITS & WITHDRAWALS
+    db.ref('deposits').on('value', snap => {
+        const box = document.getElementById('depositRequests');
+        box.innerHTML = '';
+        const data = snap.val();
+        if(!data) return box.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">कोई पेंडिंग रिक्वेस्ट नहीं है।</p>';
+
+        for(let id in data) {
+            const req = data[id];
+            if(req.status === 'pending') {
+                box.innerHTML += `
+                    <div class="bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700">
+                        <div>
+                            <p class="font-bold text-green-400">₹${req.amount} | UTR: ${req.utr}</p>
+                            <p class="text-[11px] text-gray-300">${req.userName} (UID: ${req.uid})</p>
+                        </div>
+                        <button onclick="approveDeposit('${id}', '${req.uid}', ${req.amount})" class="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition">Approve (+बैलेंस)</button>
+                    </div>
+                `;
+            }
+        }
+    });
+
+    function approveDeposit(id, uid, amount) {
+        db.ref('users/' + uid).once('value', snap => {
+            const cur = Number(snap.val()?.balance || 0);
+            db.ref('users/' + uid).update({ balance: cur + Number(amount) });
+            db.ref('deposits/' + id).update({ status: 'approved' }).then(() => alert(`✅ ₹${amount} जुड़ गए!`));
+        });
+    }
+
+    db.ref('withdrawals').on('value', snap => {
+        const box = document.getElementById('withdrawRequests');
+        box.innerHTML = '';
+        const data = snap.val();
+        if(!data) return box.innerHTML = '<p class="text-gray-500 text-xs text-center py-6">कोई विड्रॉल रिक्वेस्ट नहीं है।</p>';
+
+        for(let id in data) {
+            const req = data[id];
+            if(req.status === 'pending') {
+                box.innerHTML += `
+                    <div class="bg-gray-800 p-2.5 rounded-lg flex justify-between items-center border border-gray-700">
+                        <div>
+                            <p class="font-bold text-yellow-400">₹${req.amount} भेजना है</p>
+                            <p class="text-[11px] text-white font-mono bg-gray-900 px-1.5 py-0.5 rounded select-all font-bold">UPI: ${req.upi}</p>
+                            <p class="text-[10px] text-gray-400">${req.userName} (UID: ${req.uid})</p>
+                        </div>
+                        <button onclick="approveWithdraw('${id}', '${req.upi}', ${req.amount})" class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1.5 rounded-lg text-xs font-black transition">Paid (भेज दिया)</button>
+                    </div>
+                `;
+            }
+        }
+    });
+
+    function approveWithdraw(id, upi, amount) {
+        if(confirm(`क्या आपने UPI (${upi}) पर ₹${amount} भेज दिए हैं?`)) {
+            db.ref('withdrawals/' + id).update({ status: 'paid' }).then(() => alert('✅ Paid मार्क हो गया!'));
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+  </script>
