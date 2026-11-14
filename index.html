@@ -1,4 +1,4 @@
-<!DOCTYPE html>6
+<!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta name="google-site-verification" content="pH_S3FCAXd1QVALVDGDcnMhrUxhHOwSsVyzZqt87StY" />
@@ -320,9 +320,9 @@
         </div>
     </div>
 
-    <!-- MODAL: WALLET (WITH TRANSACTION PASSBOOK) -->
+    <!-- MODAL: WALLET (DEPOSIT, WITHDRAW, REDEEM CODE & PASSBOOK) -->
     <div id="walletModal" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-gray-900 border border-yellow-500/30 p-5 rounded-3xl w-full max-w-xs space-y-3 shadow-2xl my-auto">
+        <div class="bg-gray-900 border border-yellow-500/30 p-5 rounded-3xl w-full max-w-sm space-y-3 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                 <div>
                     <h3 class="font-black text-yellow-400 text-sm">💰 MX E-SPORTS WALLET</h3>
@@ -331,10 +331,11 @@
                 <button onclick="closeModal('walletModal')" class="text-gray-400 font-bold">&times;</button>
             </div>
 
-            <!-- 3 SUB TABS (DEPOSIT, WITHDRAW, PASSBOOK) -->
-            <div class="flex bg-gray-950 p-1 rounded-xl text-[11px] font-bold text-center border border-gray-800 gap-1">
-                <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">➕ Add Coins</button>
+            <!-- 4 SUB TABS (DEPOSIT, WITHDRAW, REDEEM, PASSBOOK) -->
+            <div class="flex bg-gray-950 p-1 rounded-xl text-[10px] font-bold text-center border border-gray-800 gap-1">
+                <button onclick="toggleWalletView('deposit')" id="btnDep" class="flex-1 py-1.5 rounded-lg bg-yellow-500 text-black">➕ Add</button>
                 <button onclick="toggleWalletView('withdraw')" id="btnWth" class="flex-1 py-1.5 rounded-lg text-gray-400">💸 Withdraw</button>
+                <button onclick="toggleWalletView('redeem')" id="btnRedeem" class="flex-1 py-1.5 rounded-lg text-gray-400">🎟️ Redeem</button>
                 <button onclick="toggleWalletView('passbook')" id="btnPass" class="flex-1 py-1.5 rounded-lg text-gray-400">📜 पासबुक</button>
             </div>
 
@@ -370,9 +371,29 @@
                 </div>
             </div>
 
-            <!-- TAB 3: PASSBOOK (TRANSACTION HISTORY) -->
+            <!-- TAB 3: REDEEM CODE -->
+            <div id="redeemSection" class="space-y-3 hidden">
+                <div class="bg-gray-950 p-3 rounded-2xl border border-yellow-500/30 text-center space-y-1">
+                    <p class="text-2xl">🎁</p>
+                    <p class="text-xs font-black text-yellow-400">रिडीम कोड से तुरंत कॉइन पाएं</p>
+                    <p class="text-[10px] text-gray-400">ऑफिशियल रिडीम कोड दर्ज करें और वॉलेट में बैलेंस जोड़ें।</p>
+                </div>
+                <div class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[10px] text-gray-400 space-y-1">
+                    <p class="text-yellow-400 font-bold">📌 नियम:</p>
+                    <p>• एक खिलाड़ी एक कोड को केवल 1 बार इस्तेमाल कर सकता है।</p>
+                    <p>• कोड लागू होते ही पैसे तुरंत वॉलेट में आ जाएँगे।</p>
+                </div>
+                <div class="space-y-2">
+                    <input id="redeemCodeInput" type="text" placeholder="रिडीम कोड डालें (जैसे: MX50)" class="w-full p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-xs text-yellow-400 font-mono uppercase tracking-wider focus:outline-none focus:border-yellow-500">
+                    <button id="redeemSubmitBtn" onclick="submitRedeemCode()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-black font-black py-2.5 rounded-xl text-xs shadow transition">
+                        🎟️ कोड रिडीम करें (Claim Now)
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 4: PASSBOOK (TRANSACTION HISTORY) -->
             <div id="passbookSection" class="space-y-2 hidden">
-                <p class="text-[10px] text-gray-400">सभी लेन-देन (डिपॉजिट व विड्रॉल):</p>
+                <p class="text-[10px] text-gray-400">सभी लेन-देन (डिपॉजिट, विड्रॉल व रिडीम):</p>
                 <div id="passbookListContainer" class="max-h-60 overflow-y-auto space-y-2 pr-1 text-xs divide-y divide-gray-800/80">
                     <p class="text-gray-500 text-center py-4 text-xs">कोई लेन-देन नहीं मिला।</p>
                 </div>
@@ -394,12 +415,14 @@
         let myCurrentBalance = 0;
         let activeMatch = null;
         let selectedModeFilter = 'ALL';
+        let isRedeeming = false;
 
         let cachedMatches = {};
         let cachedParticipants = {};
         let cachedResults = {};
         let cachedDeposits = {};
         let cachedWithdrawals = {};
+        let cachedRedemptions = {};
 
         window.onload = function() {
             const savedUid = localStorage.getItem('mx_auth_uid');
@@ -454,6 +477,11 @@
 
             db.ref('withdrawals').on('value', snap => {
                 cachedWithdrawals = snap.val() || {};
+                renderPassbook();
+            });
+
+            db.ref('redeem_history').on('value', snap => {
+                cachedRedemptions = snap.val() || {};
                 renderPassbook();
             });
         }
@@ -983,8 +1011,8 @@
         }
 
         function toggleWalletView(view) {
-            ['depositSection', 'withdrawSection', 'passbookSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            ['btnDep', 'btnWth', 'btnPass'].forEach(id => document.getElementById(id).className = "flex-1 py-1.5 rounded-lg text-gray-400");
+            ['depositSection', 'withdrawSection', 'redeemSection', 'passbookSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['btnDep', 'btnWth', 'btnRedeem', 'btnPass'].forEach(id => document.getElementById(id).className = "flex-1 py-1.5 rounded-lg text-gray-400");
 
             if(view === 'deposit') {
                 document.getElementById('depositSection').classList.remove('hidden');
@@ -992,6 +1020,9 @@
             } else if(view === 'withdraw') {
                 document.getElementById('withdrawSection').classList.remove('hidden');
                 document.getElementById('btnWth').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
+            } else if(view === 'redeem') {
+                document.getElementById('redeemSection').classList.remove('hidden');
+                document.getElementById('btnRedeem').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
             } else if(view === 'passbook') {
                 document.getElementById('passbookSection').classList.remove('hidden');
                 document.getElementById('btnPass').className = "flex-1 py-1.5 rounded-lg bg-yellow-500 text-black font-bold";
@@ -1059,6 +1090,104 @@
         }
 
         // ==========================================
+        // SUBMIT REDEEM CODE (WITH BLOCK & LIMIT CHECK)
+        // ==========================================
+        function submitRedeemCode() {
+            if(isRedeeming) return;
+
+            if(currentUser && currentUser.isBlocked) {
+                return alert("❌ आपका अकाउंट एडमिन द्वारा ब्लॉक कर दिया गया है! आप रिडीम कोड इस्तेमाल नहीं कर सकते।");
+            }
+
+            const code = document.getElementById('redeemCodeInput').value.trim().toUpperCase();
+            if(!code) return alert('कृपया अपना रिडीम कोड दर्ज करें!');
+
+            const btn = document.getElementById('redeemSubmitBtn');
+            isRedeeming = true;
+            btn.disabled = true;
+            btn.innerText = 'चेक हो रहा है...';
+
+            const resetBtn = () => {
+                isRedeeming = false;
+                btn.disabled = false;
+                btn.innerText = '🎟️ कोड रिडीम करें (Claim Now)';
+            };
+
+            db.ref('redeem_codes/' + code).once('value').then(snap => {
+                if(!snap.exists()) {
+                    resetBtn();
+                    return alert('❌ यह रिडीम कोड गलत है या मौजूद नहीं है!');
+                }
+
+                const data = snap.val();
+                const amount = (typeof data === 'object') ? Number(data.amount || 0) : Number(data);
+
+                if(!amount || amount <= 0) {
+                    resetBtn();
+                    return alert('❌ यह रिडीम कोड अमान्य है!');
+                }
+
+                if(typeof data === 'object') {
+                    if(data.active === false) {
+                        resetBtn();
+                        return alert('❌ यह रिडीम कोड अब बंद (Inactive) हो चुका है!');
+                    }
+                    if(data.expiry && Date.now() > Number(data.expiry)) {
+                        resetBtn();
+                        return alert('❌ यह रिडीम कोड एक्सपायर हो चुका है!');
+                    }
+                    if(data.usedBy && data.usedBy[currentUser.uid]) {
+                        resetBtn();
+                        return alert('⚠️ आप यह रिडीम कोड पहले ही इस्तेमाल कर चुके हैं!');
+                    }
+                    if(data.maxUses && Number(data.usedCount || 0) >= Number(data.maxUses)) {
+                        resetBtn();
+                        return alert('⚠️ इस रिडीम कोड की लिमिट पूरी हो चुकी है!');
+                    }
+                }
+
+                db.ref('users/' + currentUser.uid + '/redeemedCodes/' + code).once('value').then(uSnap => {
+                    if(uSnap.exists()) {
+                        resetBtn();
+                        return alert('⚠️ आप यह रिडीम कोड पहले ही इस्तेमाल कर चुके हैं!');
+                    }
+
+                    // Add amount to user balance safely
+                    db.ref('users/' + currentUser.uid + '/balance').transaction(bal => {
+                        return (Number(bal) || 0) + amount;
+                    }).then(() => {
+                        db.ref('users/' + currentUser.uid + '/redeemedCodes/' + code).set(true);
+
+                        if(typeof data === 'object') {
+                            db.ref('redeem_codes/' + code + '/usedBy/' + currentUser.uid).set(true);
+                            db.ref('redeem_codes/' + code + '/usedCount').transaction(cnt => (Number(cnt) || 0) + 1);
+                        }
+
+                        db.ref('redeem_history').push({
+                            userName: currentUser.name,
+                            uid: currentUser.uid,
+                            code: code,
+                            amount: amount,
+                            status: 'approved',
+                            time: Date.now()
+                        }).then(() => {
+                            alert(`🎉 बधाई हो! रिडीम कोड "${code}" लागू हो गया!\n₹${amount} आपके वॉलेट में जोड़ दिए गए हैं।`);
+                            document.getElementById('redeemCodeInput').value = '';
+                            resetBtn();
+                            toggleWalletView('passbook');
+                        });
+                    }).catch(() => {
+                        resetBtn();
+                        alert('❌ नेटवर्क समस्या! कृपया थोड़ी देर बाद दोबारा कोशिश करें।');
+                    });
+                });
+            }).catch(() => {
+                resetBtn();
+                alert('❌ सर्वर से कनेक्ट नहीं हो सका।');
+            });
+        }
+
+        // ==========================================
         // RENDER TRANSACTION PASSBOOK
         // ==========================================
         function renderPassbook() {
@@ -1095,6 +1224,20 @@
                 }
             }
 
+            // Get Redeem Codes
+            for(let key in cachedRedemptions) {
+                const r = cachedRedemptions[key];
+                if(r.uid === currentUser.uid) {
+                    transactions.push({
+                        type: 'Redeem',
+                        amount: r.amount,
+                        time: r.time || 0,
+                        status: r.status || 'approved',
+                        detail: `Code: ${r.code}`
+                    });
+                }
+            }
+
             if(transactions.length === 0) {
                 container.innerHTML = '<p class="text-gray-500 text-center py-6 text-xs">अभी तक कोई लेन-देन नहीं हुआ है।</p>';
                 return;
@@ -1105,9 +1248,13 @@
 
             container.innerHTML = '';
             transactions.forEach(t => {
-                const isDeposit = (t.type === 'Deposit');
+                const isCredit = (t.type === 'Deposit' || t.type === 'Redeem');
                 const isSuccess = (t.status === 'approved' || t.status === 'paid');
                 const isProcessing = (t.status === 'pending');
+
+                let titleText = '📤 विड्रॉल (Cashout)';
+                if(t.type === 'Deposit') titleText = '📥 डिपॉजिट (Add Money)';
+                if(t.type === 'Redeem') titleText = '🎁 रिडीम कोड (Redeem)';
 
                 const dateStr = t.time ? new Date(t.time).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A';
 
@@ -1115,16 +1262,16 @@
                     <div class="py-2.5 flex justify-between items-center">
                         <div>
                             <div class="flex items-center gap-1.5">
-                                <span class="font-bold text-xs ${isDeposit ? 'text-green-400' : 'text-yellow-400'}">
-                                    ${isDeposit ? '📥 डिपॉजिट (Add Money)' : '📤 विड्रॉल (Cashout)'}
+                                <span class="font-bold text-xs ${isCredit ? 'text-green-400' : 'text-yellow-400'}">
+                                    ${titleText}
                                 </span>
                             </div>
                             <p class="text-[10px] text-gray-400 font-mono">${dateStr}</p>
                             <p class="text-[10px] text-gray-500">${t.detail}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-black font-mono text-xs ${isDeposit ? 'text-green-400' : 'text-yellow-400'}">
-                                ${isDeposit ? '+' : '-'}₹${t.amount}
+                            <p class="font-black font-mono text-xs ${isCredit ? 'text-green-400' : 'text-yellow-400'}">
+                                ${isCredit ? '+' : '-'}₹${t.amount}
                             </p>
                             <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${isProcessing ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 animate-pulse' : (isSuccess ? 'bg-green-500/20 text-green-400 border border-green-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40')}">
                                 ${isProcessing ? '⏳ Processing' : (isSuccess ? '✅ Success' : '❌ Failed')}
@@ -1136,4 +1283,4 @@
         }
     </script>
 </body>
-                            </html>
+                    </html>
